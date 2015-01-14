@@ -110,23 +110,67 @@ class Controller:
         
         try:
             
+            # Should I randomize the order of nodes?
             for node in nodes:
                 beacon_type = node[BEACON_TYPE_IND]
                 params = node[PARAMS_IND]
         
-                beaconer_class = self.beacon_map.get('beacon_type') # get this from the beacon map based on beacon type
+                beaconer_class = self.beacon_map.get(beacon_type) # get this from the beacon map based on beacon type
                 beaconer = beaconer_class() # instantiate the object
                 success, response = beaconer.beacon(params)
                 
                 if success:
                     return (success, response)
+                else:
+                    
+                    # Should I pause here or just continue?
+                    continue
+                
+            # What do I do if none of the nodes worked?
+            return (False, None)
             
         except Exception,e :
             raise e
+    
+    def recursive_decoder(self, decoder, encoded_data):
         
+        decoded_data = []
+        
+        for encoded_portion in encoded_data:
+            
+            portion_type = type(encoded_portion)
+            
+            if portion_type is dict:
+                
+                decoded_portion = {}
+                
+                for encoded_key, encoded_value in encoded_portion:
+                    decoded_key = decoder.decode(encoded_key)
+                    decoded_value = decoder.decode(encoded_value)
+                    decoded_portion[decoded_key] = decoded_value
+                    
+                decoded_data.append(decoded_portion)
+                
+            elif portion_type is list or portion_type is tuple:
+                decoded_data.append(self.recursive_decoder(decoder, encoded_portion))
+                
+            else:
+                print 'Data was not formatted as dict or list!'
+                raise
+        
+        return decoded_data
     
     def handle_decode(self, encoded_data):
-        pass
+        
+        # while there is another decoder, run each item through the next decoder
+        data = encoded_data
+        
+        for decoder in self.decoder_map:
+            
+            current_decoder = decoder()
+            data = self.recursive_decoder(current_decoder, data)
+            
+        return data
     
     def handle_command(self, command, params):
         pass
