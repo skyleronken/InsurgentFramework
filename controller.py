@@ -63,10 +63,7 @@ class Controller:
         else:
             ret_val = {}
         
-        # ['http_get','syn_flood']
-        
         for module_name in name_list:
-            # Fix this so that you can hand a list of all of the types of modules (beacons, commands, etc).
             module_class = self.easy_import(pkg_name, module_name)
             if return_list:
                 ret_val.append(module_class)
