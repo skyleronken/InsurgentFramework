@@ -38,7 +38,7 @@ def load_config():
     encoders = []
     responders = []
     
-    return (beacons,commands,decoders)
+    return (beacons,commands,decoders,encoders,responders)
     
 def calculate_sleep():
 
