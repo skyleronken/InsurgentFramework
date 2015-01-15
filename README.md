@@ -12,6 +12,6 @@ A framework for creating modular implants to be used in training environments
 
 <h6>Milestones:</h6>
 <i>
-1/15/2015 - Dynamic Importer and beaconing importer verified
+1/15/2015 - Dynamic Importer and beaconing handler verified
 
 </i>
