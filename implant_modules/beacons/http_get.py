@@ -1,6 +1,5 @@
 import httplib
 from socket import error as socket_error
-
 from beacon import Beacon
 
 class HttpGet(Beacon):

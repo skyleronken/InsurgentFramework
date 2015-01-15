@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 
-class Decoper:
+class Decoder:
     __metaclass__ = ABCMeta
     
     display_name = "Abstract Decoder"

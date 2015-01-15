@@ -1,5 +1,4 @@
 import base64
-
 from decoder import Decoder
 
 class Base64(Decoder):

