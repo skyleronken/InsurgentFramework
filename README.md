@@ -1,4 +1,4 @@
-# PythonImplantFramework
+# Python Implant Framework
 A framework for creating modular implants to be used in training environments
 
 <h4>Priorites</h4>
