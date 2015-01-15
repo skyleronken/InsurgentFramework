@@ -24,7 +24,7 @@ DECODER_PKG = MODULE_PATH + '.' +'decoders'
 class Controller:
     
     beacon_map = {}
-    decoder_map = {} # this contains lists, others are 1d
+    decoder_list = {}
     command_map = {}
     response_map = {}
     
@@ -64,6 +64,7 @@ class Controller:
             ret_val = {}
         
         for module_name in name_list:
+
             module_class = self.easy_import(pkg_name, module_name)
             if return_list:
                 ret_val.append(module_class)
@@ -90,7 +91,7 @@ class Controller:
     
     def build_decoder_handler(self, decoders):
         
-        self.decoder_map = self.abstract_builder(DECODER_PKG, decoders, True) #return a list
+        self.decoder_list = self.abstract_builder(DECODER_PKG, decoders, True) #return a list
     
     def build_handlers(self, beacons, commands, decoders):
         # this function is used by the constructor to setup the dictionaries with the command to command object mapping.
@@ -130,7 +131,9 @@ class Controller:
                 
             # What do I do if none of the nodes worked?
             return (False, None)
-            
+        except TypeError as e:
+            print "No such class for provided beacon type: %s" % (beacon_type)
+            raise e
         except Exception,e :
             raise e
     
@@ -168,7 +171,7 @@ class Controller:
         data = encoded_data
         success = True
         
-        for decoder in self.decoder_map:
+        for decoder in self.decoder_list:
             
             current_decoder = decoder()
             data = self.recursive_decoder(current_decoder, data)
@@ -184,7 +187,7 @@ class Controller:
     def handle(self, nodes):
         
         try:
-
+            print "Controller: trying to beacon..."
             # Send command to beacon handler
             success, encoded_data = self.handle_beacon(nodes)
             

@@ -10,7 +10,6 @@ class HttpGet(Beacon):
         return response
     
     def beacon(self,arguments):
-        
         success = True
         
         node = arguments.get('node')

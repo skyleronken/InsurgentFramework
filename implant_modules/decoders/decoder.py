@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta
 
 
 class Decoder:
@@ -6,11 +6,9 @@ class Decoder:
     
     display_name = "Abstract Decoder"
     
-    @abstractproperty
     def name(self):
         return self.display_name
     
-    @abstractmethod
     def decode(self, arguments):
         
         #

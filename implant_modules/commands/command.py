@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta
 
 # Central location to store globals. Allows us to change plain text data into hex or alpha numeric names, etc for params.
 D_PORT_KEY = 'd_port'
@@ -14,11 +14,9 @@ class Command:
     
     display_name = "Abstract Command"
     
-    @abstractproperty
     def name(self):
         return self.display_name
     
-    @abstractmethod
     def execute(self, arguments):
         
         #

