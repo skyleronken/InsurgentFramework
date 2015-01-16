@@ -34,8 +34,6 @@ DECODER_PKG = MODULE_PATH + '.' +'codecs'
 ENCODER_PKG = MODULE_PATH + '.' + 'codecs'
 RESPONDER_PKG = MODULE_PATH + '.' + 'responders'
 
-KEY_KEY = 'key'
-VAL_KEY = 'val'
 CMD_SUCC_KEY = 'success'
 CMD_RES_KEY = 'results'
 NODE_IP_KEY = 'node'
@@ -107,28 +105,22 @@ class Controller:
     # Hence, I am using a ludicrous number of functions and facades.
     
     def build_beacon_handler(self, beacons):
-        
         self.beacon_map = self.abstract_builder(BEACON_PKG, beacons)
 
     def build_command_handler(self, commands):
-        
         self.command_map = self.abstract_builder(COMMAND_PKG, commands)
     
     def build_decoder_handler(self, decoders):
-        
         self.decoder_list = self.abstract_builder(DECODER_PKG, decoders, True) #return a list
         
     def build_encoder_handler(self, encoders):
-        
         self.encoder_list = self.abstract_builder(ENCODER_PKG, encoders, True) #return a list
         
     def build_responder_handler(self, responders):
-    
         self.response_map = self.abstract_builder(RESPONDER_PKG, responders)
     
     def build_handlers(self, beacons, commands, decoders, encoders, responders):
         # this function is used by the constructor to setup the dictionaries with the command to command object mapping.
-        
         self.build_beacon_handler(beacons)
         self.build_command_handler(commands)
         self.build_decoder_handler(decoders)
@@ -199,22 +191,22 @@ class Controller:
             for encoded_portion in encoded_data:
                 
                 portion_type = type(encoded_portion)
-
                 if portion_type is dict:
-                    
+
                     decoded_portion = {}
                     for encoded_key, encoded_value in encoded_portion.items():
                         decoded_key = decoder.decode(encoded_key)
                         
                         if type(encoded_value) is list or type(encoded_value) is dict:
+                            print encoded_value, type(encoded_value)
                             success, data = self.recursive_decoder(decoder, encoded_value)
+                            #print data, type(data)
                             decoded_value = data
                         else:
                             decoded_value = decoder.decode(encoded_value)
-                            
-                        decoded_portion[KEY_KEY] = decoded_key
-                        decoded_portion[VAL_KEY] = decoded_value
                         
+                        decoded_portion[decoded_key] = decoded_value
+
                     decoded_data.append(decoded_portion)
                     
                 elif portion_type is list or portion_type is tuple or isinstance(encoded_portion,basestring):
@@ -232,7 +224,7 @@ class Controller:
                     raise
             
             ## NOTE: If nested multiple commands breaks, this is likely the culprit
-            if len(encoded_data) == 1:
+            if len(decoded_data) == 1:
                 decoded_data = decoded_data[0]
                 
         except Exception, e:
@@ -263,9 +255,11 @@ class Controller:
         agg_results = []
         
         if type_check is dict:
-            cmd_class = self.command_map.get(command[KEY_KEY])
+            
+            cmd_name, params = command
+            cmd_class = self.command_map.get(cmd_name)
             cmd_obj = cmd_class()
-            success, results = cmd_obj.execute(command[VAL_KEY])
+            success, results = cmd_obj.execute(params)
             
             cur_results = {}
             cur_results[CMD_SUCC_KEY] = success
