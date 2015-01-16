@@ -188,9 +188,12 @@ class Controller:
                 
             elif portion_type is list or portion_type is tuple:
                 decoded_data.append(self.recursive_decoder(decoder, encoded_portion))
-                
+            
+            elif portion_type is str:
+                decoded_data.append(decoder.decode(encoded_portion))
+            
             else:
-                print 'Data was not formatted as dict or list!'
+                print 'Data was not formatted as dict, list/tuple or string!'
                 raise
         
         return decoded_data
