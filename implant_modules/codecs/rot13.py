@@ -1,8 +1,8 @@
-from decoder import Decoder
+from codec import Codec
 import codecs
 
 
-class ROT13(Decoder):
+class ROT13(Codec):
     
     display_name = "ROT-13"
     
@@ -12,3 +12,6 @@ class ROT13(Decoder):
         
         decoded_data = codecs.decode(data, 'rot_13')
         return decoded_data
+        
+    def encode(self, params):
+        pass

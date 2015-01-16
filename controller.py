@@ -30,9 +30,14 @@ PARAMS_IND = 1
 MODULE_PATH = 'implant_modules'
 BEACON_PKG = MODULE_PATH + '.' + 'beacons'
 COMMAND_PKG = MODULE_PATH + '.' +'commands'
-DECODER_PKG = MODULE_PATH + '.' +'decoders'
-ENCODER_PKG = MODULE_PATH + '.' + 'encoders'
+DECODER_PKG = MODULE_PATH + '.' +'codecs'
+ENCODER_PKG = MODULE_PATH + '.' + 'codecs'
 RESPONDER_PKG = MODULE_PATH + '.' + 'responders'
+
+KEY_KEY = 'key'
+VAL_KEY = 'val'
+CMD_SUCC_KEY = 'success'
+CMD_RES_KEY = 'results'
 
 class Controller:
     
@@ -43,6 +48,10 @@ class Controller:
     response_map = {}
     
     def __init__(self, beacons, commands, decoders, encoders, responders):
+        
+        if len(encoders) == 0:
+            encoders = reversed(decoders)
+        
         self.build_handlers(beacons, commands, decoders, encoders, responders)
     
     # ###############
@@ -182,7 +191,8 @@ class Controller:
                 for encoded_key, encoded_value in encoded_portion:
                     decoded_key = decoder.decode(encoded_key)
                     decoded_value = decoder.decode(encoded_value)
-                    decoded_portion[decoded_key] = decoded_value
+                    decoded_portion[KEY_KEY] = decoded_key
+                    decoded_portion[VAL_KEY] = decoded_value
                     
                 decoded_data.append(decoded_portion)
                 
@@ -210,12 +220,41 @@ class Controller:
             
             current_decoder = decoder()
             data = self.recursive_decoder(current_decoder, data)
-            
+        
         return success, data
     
-    def handle_command(self, command, params):
-        print CMD_PROMPT + " calling command..."
-        pass
+    def recursive_execute(self, command):
+        type_check = type(command)
+        
+        agg_results = []
+        
+        if type_check is dict:
+            cmd_class = self.command_map.get(command[KEY_KEY])
+            cmd_obj = cmd_class()
+            success, results = cmd_obj.execute(command[VAL_KEY])
+            
+            cur_results = {}
+            cur_results[CMD_SUCC_KEY] = success
+            cur_results[CMD_RES_KEY] = results
+            agg_results.append(cur_results)
+            
+        elif type_check is list:
+            success, results = self.recursive_execute(command)
+            # not doing anything with success here
+            agg_results.append(results)
+        else:
+            print CMD_PROMPT + " Improper formatted command: %s" % (command)
+            
+        return success, agg_results
+    
+    def handle_command(self, commands):
+        print CMD_PROMPT + " calling commands..."
+        
+        for command in commands:
+            success, result = self.recursive_execute(command)
+            # Is there going to be complex results checking and handling code?
+
+        # check results for threads, if there are, add them to a pool to be tracked
     
     def handle_encode(self, results):
         print ENC_PROMPT + " encoding results..."
@@ -239,8 +278,7 @@ class Controller:
             
             # Process command
             if success:
-                command, params = decoded_data
-                success, results = self.handle_command(command, params)
+                success, results = self.handle_command(decoded_data)
             else:
                 return False
             

@@ -1,7 +1,7 @@
 import json
-from decoder import Decoder
+from codec import Codec
 
-class JSON(Decoder):
+class JSON(Codec):
     
     display_name = "JSON"
     
@@ -12,3 +12,6 @@ class JSON(Decoder):
         decoded_json = json.loads(json_data)
     
     	return decoded_json
+    	
+    def encode(self, params):
+        pass

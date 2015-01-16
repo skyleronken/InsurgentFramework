@@ -1,7 +1,7 @@
 import base64
-from decoder import Decoder
+from codec import Codec
 
-class Base64(Decoder):
+class Base64(Codec):
     
     display_name = "Base 64"
     
@@ -11,3 +11,6 @@ class Base64(Decoder):
         
         decoded_data = base64.urlsafe_b64decode(data)
         return decoded_data
+        
+    def encode(self, params):
+        pass
