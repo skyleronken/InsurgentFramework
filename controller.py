@@ -192,7 +192,7 @@ class Controller:
         
         try:
             
-            if type(encoded_data) is str:
+            if isinstance(encoded_data,basestring):
                 decoded_data.append(decoder.decode(encoded_data))
                 return success, decoded_data
             
@@ -217,7 +217,7 @@ class Controller:
                         
                     decoded_data.append(decoded_portion)
                     
-                elif portion_type is list or portion_type is tuple or portion_type is str:
+                elif portion_type is list or portion_type is tuple or isinstance(encoded_portion,basestring):
                     
                     success, data = self.recursive_decoder(decoder, encoded_portion)
                     if success:
@@ -227,6 +227,7 @@ class Controller:
                     
                 
                 else:
+                    print portion_type is basestring
                     print DEC_PROMPT + 'Data was not formatted as dict, list/tuple!'
                     raise
             
