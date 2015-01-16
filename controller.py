@@ -186,21 +186,15 @@ class Controller:
             
             if isinstance(encoded_data,basestring):
                 decoded_data.append(decoder.decode(encoded_data))
-                return success, decoded_data
-            
-            for encoded_portion in encoded_data:
+                #return success, decoded_data
+            elif type(encoded_data) is dict:
                 
-                portion_type = type(encoded_portion)
-                if portion_type is dict:
-
                     decoded_portion = {}
-                    for encoded_key, encoded_value in encoded_portion.items():
+                    for encoded_key, encoded_value in encoded_data.items():
                         decoded_key = decoder.decode(encoded_key)
                         
                         if type(encoded_value) is list or type(encoded_value) is dict:
-                            print encoded_value, type(encoded_value)
                             success, data = self.recursive_decoder(decoder, encoded_value)
-                            #print data, type(data)
                             decoded_value = data
                         else:
                             decoded_value = decoder.decode(encoded_value)
@@ -209,7 +203,9 @@ class Controller:
 
                     decoded_data.append(decoded_portion)
                     
-                elif portion_type is list or portion_type is tuple or isinstance(encoded_portion,basestring):
+            elif type(encoded_data) is list or type(encoded_data) is tuple:
+
+                for encoded_portion in encoded_data:
                     
                     success, data = self.recursive_decoder(decoder, encoded_portion)
                     if success:
@@ -217,11 +213,10 @@ class Controller:
                     else:
                         return (False, None)
                     
-                
-                else:
-                    print portion_type is basestring
-                    print DEC_PROMPT + 'Data was not formatted as dict, list/tuple!'
-                    raise
+            else:
+                print type(encoded_data), encoded_data
+                print DEC_PROMPT + 'Data was not formatted as dict, list/tuple, string!'
+                raise
             
             ## NOTE: If nested multiple commands breaks, this is likely the culprit
             if len(decoded_data) == 1:
