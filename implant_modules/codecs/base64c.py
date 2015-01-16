@@ -1,18 +1,20 @@
-from codec import Codec
-import codecs
 
-class ROT13(Codec):
+from base64 import urlsafe_b64decode
+from codec import Codec
+
+class Base64C(Codec):
     
-    display_name = "ROT-13"
+    display_name = "Base 64"
     
     def decode(self, data):
-
+        
         try:
-            decoded_data = codecs.decode(data, 'rot_13')
-            return decoded_data
+            decoded_data = urlsafe_b64decode(data)
         except Exception, e:
             print e
             raise
+        
+        return decoded_data
         
     def encode(self, params):
         pass

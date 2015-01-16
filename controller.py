@@ -38,6 +38,8 @@ KEY_KEY = 'key'
 VAL_KEY = 'val'
 CMD_SUCC_KEY = 'success'
 CMD_RES_KEY = 'results'
+NODE_IP_KEY = 'node'
+NODE_PORT_KEY = 'port'
 
 class Controller:
     
@@ -153,18 +155,24 @@ class Controller:
             for node in nodes:
                 beacon_type = node[BEACON_TYPE_IND]
                 params = node[PARAMS_IND]
+                
+                ip = params.get(NODE_IP_KEY)
+                port = params.get(NODE_PORT_KEY)
         
                 beaconer_class = self.beacon_map.get(beacon_type) # get this from the beacon map based on beacon type
                 beaconer = beaconer_class() # instantiate the object
                 try:
                     success, response = beaconer.beacon(params)
                 except Exception, e:
-                    print "%s Error connecting to %s:%s" % (BEAC_PROMPT, params.get('node'), params.get('port'))
+                    print "%s Error connecting to %s:%s" % (BEAC_PROMPT, ip, port)
                     success = False
                 
                 if success:
+                    print "%s Successfully retrieved data from %s:%s" % (BEAC_PROMPT, ip, port)
                     return (success, response)
                 else:
+                    # Will not all failures raise an exception? Perahsp this should be forced implementation by all Beaconers?
+                    # print "%s Failed to retrieve data from %s:%s" % (BEAC_PROMPT, ip, port)
                     # Should I pause here or just continue?
                     pass
                 
@@ -180,33 +188,58 @@ class Controller:
         
         decoded_data = []
         
-        for encoded_portion in encoded_data:
-            
-            portion_type = type(encoded_portion)
-            
-            if portion_type is dict:
-                
-                decoded_portion = {}
-                
-                for encoded_key, encoded_value in encoded_portion:
-                    decoded_key = decoder.decode(encoded_key)
-                    decoded_value = decoder.decode(encoded_value)
-                    decoded_portion[KEY_KEY] = decoded_key
-                    decoded_portion[VAL_KEY] = decoded_value
-                    
-                decoded_data.append(decoded_portion)
-                
-            elif portion_type is list or portion_type is tuple:
-                decoded_data.append(self.recursive_decoder(decoder, encoded_portion))
-            
-            elif portion_type is str:
-                decoded_data.append(decoder.decode(encoded_portion))
-            
-            else:
-                print 'Data was not formatted as dict, list/tuple or string!'
-                raise
+        success = True
         
-        return decoded_data
+        try:
+            
+            if type(encoded_data) is str:
+                decoded_data.append(decoder.decode(encoded_data))
+                return success, decoded_data
+            
+            for encoded_portion in encoded_data:
+                
+                portion_type = type(encoded_portion)
+
+                if portion_type is dict:
+                    
+                    decoded_portion = {}
+                    for encoded_key, encoded_value in encoded_portion.items():
+                        decoded_key = decoder.decode(encoded_key)
+                        
+                        if type(encoded_value) is list or type(encoded_value) is dict:
+                            success, data = self.recursive_decoder(decoder, encoded_value)
+                            decoded_value = data
+                        else:
+                            decoded_value = decoder.decode(encoded_value)
+                            
+                        decoded_portion[KEY_KEY] = decoded_key
+                        decoded_portion[VAL_KEY] = decoded_value
+                        
+                    decoded_data.append(decoded_portion)
+                    
+                elif portion_type is list or portion_type is tuple or portion_type is str:
+                    
+                    success, data = self.recursive_decoder(decoder, encoded_portion)
+                    if success:
+                        decoded_data.append(data)
+                    else:
+                        return (False, None)
+                    
+                
+                else:
+                    print DEC_PROMPT + 'Data was not formatted as dict, list/tuple!'
+                    raise
+            
+            ## NOTE: If nested multiple commands breaks, this is likely the culprit
+            if len(encoded_data) == 1:
+                decoded_data = decoded_data[0]
+                
+        except Exception, e:
+                print e
+                print DEC_PROMPT + " Issue in %s decoder while trying to decode %s " % (decoder.name(), encoded_data)
+                return (False, None)
+        
+        return success, decoded_data
     
     def handle_decode(self, encoded_data):
         
@@ -214,13 +247,13 @@ class Controller:
         
         # while there is another decoder, run each item through the next decoder
         data = encoded_data
-        success = True
-        
+        success = False
         for decoder in self.decoder_list:
-            
             current_decoder = decoder()
-            data = self.recursive_decoder(current_decoder, data)
-        
+            success, data = self.recursive_decoder(current_decoder, data)
+            if not success:
+                break
+            print DEC_PROMPT + "%s decoded to '%s'" % ( current_decoder.name(),data)
         return success, data
     
     def recursive_execute(self, command):

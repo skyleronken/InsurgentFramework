@@ -7,19 +7,23 @@ class HttpGet(Beacon):
     display_name = "HTTP Download"
     
     def agnosticize(self, response):
-        return response
+        
+        # chomp the last crlf from http
+        clean_response = response.rstrip('\n')
+        return clean_response
     
     def beacon(self,arguments):
         success = True
         
         node = arguments.get('node')
         path = arguments.get('path')
-        timeout = arguments.get('timeout') # Should this be passed? Probably not...
+        port = arguments.get('port')
+        timeout = arguments.get('timeout', 8) # Should this be passed? Probably not...
         
-        conn = httplib.HTTPConnection(node, timeout=timeout)
+        conn = httplib.HTTPConnection(node, port, timeout=timeout)
         conn.request("GET", path)
         response = conn.getresponse()
-        
+
         if response.status != httplib.OK:
 			raise httplib.HTTPException
 

