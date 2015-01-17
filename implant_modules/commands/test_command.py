@@ -10,6 +10,5 @@ class TestCommand(Command):
     
     def execute(self, cmd_line):
         
-        print 'Test Command: %s' % (cmd_line)
         return (True, 'Results')
         

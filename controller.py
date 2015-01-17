@@ -257,6 +257,7 @@ class Controller:
                 for cmd, params in command.items():
                     cmd_class = self.command_map.get(cmd)
                     cmd_obj = cmd_class()
+                    print CMD_PROMPT + " Executing: %s" % (cmd_obj.name())
                     success, results = cmd_obj.execute(params)
     
                 cmd_results = {}
@@ -265,10 +266,13 @@ class Controller:
                 agg_results.append(cmd_results)
 
             elif type_check is list:
+                print CMD_PROMPT + " Beginning Sub Command Chain"
                 for cur_cmd in command:
                     success, results = self.recursive_execute(cur_cmd)
                     # not doing anything with success here
                     agg_results.append(results)
+                print CMD_PROMPT + " Finishing Sub Command Chain"
+
                     
             else:
                 print CMD_PROMPT + " Improper formatted command: %s" % (command)
@@ -283,13 +287,15 @@ class Controller:
         
         results = []
         success = False
-        
+
+        print CMD_PROMPT + " Beginning Command Chain"
         for command in commands:
             success, result = self.recursive_execute(command)
             # Is there going to be complex results checking and handling code?
             results.append(result)
             
         # check results for threads, if there are, add them to a pool to be tracked
+        print CMD_PROMPT + " Command Chain Completed"
         return success, results
 
     
