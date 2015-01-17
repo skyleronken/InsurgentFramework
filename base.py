@@ -35,7 +35,7 @@ def load_config():
     # this is where the configuration file is parsed.
     #
     beacons = ['http_get']
-    commands = ['syn_flood','http_download']
+    commands = ['shell_command', 'test_command']
     decoders = ['base64c','jsonc','rot13']
     encoders = []
     responders = []

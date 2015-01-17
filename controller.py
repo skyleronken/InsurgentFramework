@@ -14,6 +14,7 @@ from socket import error as socket_error
 # - Parse XML to build mappings
 # - Considering wrapping each node into a Node class upon initial import.
 # - Fix easy_import and abstract_builder so you can hand it a list of the modules for a package (beacons, commands, etc), since the import can receive a list. More efficient.
+# - Consider change command modules from {cmd:params} to (cmd, params) tuple. Better utilizes types to separate data. 
 
 PROMP_SEP = "->"
 PROMP_BASE = "[Controller"
@@ -248,36 +249,49 @@ class Controller:
         type_check = type(command)
         
         agg_results = []
-        
-        if type_check is dict:
+        success = False
+
+        try:
+
+            if type_check is dict:
+                for cmd, params in command.items():
+                    cmd_class = self.command_map.get(cmd)
+                    cmd_obj = cmd_class()
+                    success, results = cmd_obj.execute(params)
+    
+                cmd_results = {}
+                cmd_results[CMD_SUCC_KEY] = success
+                cmd_results[CMD_RES_KEY] = results
+                agg_results.append(cmd_results)
+
+            elif type_check is list:
+                for cur_cmd in command:
+                    success, results = self.recursive_execute(cur_cmd)
+                    # not doing anything with success here
+                    agg_results.append(results)
+                    
+            else:
+                print CMD_PROMPT + " Improper formatted command: %s" % (command)
             
-            cmd_name, params = command
-            cmd_class = self.command_map.get(cmd_name)
-            cmd_obj = cmd_class()
-            success, results = cmd_obj.execute(params)
-            
-            cur_results = {}
-            cur_results[CMD_SUCC_KEY] = success
-            cur_results[CMD_RES_KEY] = results
-            agg_results.append(cur_results)
-            
-        elif type_check is list:
-            success, results = self.recursive_execute(command)
-            # not doing anything with success here
-            agg_results.append(results)
-        else:
-            print CMD_PROMPT + " Improper formatted command: %s" % (command)
+        except Exception, e:
+            raise
             
         return success, agg_results
     
     def handle_command(self, commands):
         print CMD_PROMPT + " calling commands..."
         
+        results = []
+        success = False
+        
         for command in commands:
             success, result = self.recursive_execute(command)
             # Is there going to be complex results checking and handling code?
-
+            results.append(result)
+            
         # check results for threads, if there are, add them to a pool to be tracked
+        return success, results
+
     
     def handle_encode(self, results):
         print ENC_PROMPT + " encoding results..."
