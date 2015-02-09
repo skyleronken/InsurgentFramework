@@ -1,8 +1,9 @@
-from json import loads
+from json import loads, dumps
 from codec import Codec
 
 class JSONC(Codec):
     
+    full_body_encode = True
     display_name = "JSON"
     
     def decode(self, data):
@@ -14,4 +15,9 @@ class JSONC(Codec):
     	    print e
     	
     def encode(self, params):
-        pass
+        try:
+            encoded_json = dumps(params)
+            return encoded_json
+            
+        except Exception, e:
+            print e

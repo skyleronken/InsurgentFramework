@@ -13,6 +13,11 @@ class Beacon:
     def agnosticize(self, response):
         return response
     
+    def send_response(self, arguments, results):
+        
+        while False:
+            yield None
+    
     def beacon(self, arguments):
         
         #

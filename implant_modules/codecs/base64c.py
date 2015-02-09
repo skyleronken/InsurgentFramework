@@ -1,5 +1,5 @@
 
-from base64 import urlsafe_b64decode
+from base64 import urlsafe_b64decode, urlsafe_b64encode
 from codec import Codec
 
 class Base64C(Codec):
@@ -17,4 +17,11 @@ class Base64C(Codec):
         return decoded_data
         
     def encode(self, params):
-        pass
+        
+        try:
+            encoded_data = urlsafe_b64encode(params)
+        except Exception, e:
+            print e
+            raise
+        
+        return encoded_data

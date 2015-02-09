@@ -11,8 +11,7 @@ class ROT13(Codec):
             decoded_data = codecs.decode(data, 'rot_13')
             return decoded_data
         except Exception, e:
-            print e
-            raise
-        
+            return data
+
     def encode(self, params):
-        pass
+        return self.decode(params)

