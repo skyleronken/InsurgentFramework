@@ -13,7 +13,6 @@ from implant_modules.order import Order
 
 # TODO:
 #
-# - Parse XML to build mappings
 # - Considering wrapping each node into a Node class upon initial import.
 # - Fix easy_import and abstract_builder so you can hand it a list of the modules for a package (beacons, commands, etc), since the import can receive a list. More efficient.
 # - Consider change command modules from {cmd:params} to (cmd, params) tuple. Better utilizes types to separate data. 

@@ -1,23 +1,20 @@
 <root>
     <nodes>
-        <node>
-            <type>http_get</type>
+        <node type='http_get'>
             <host>127.0.0.1</host>
             <port>8080</port>
             <parameters>
                 <parameter name="path">sample_command.html</parameter>
             </parameters>
         </node>
-        <node>
-            <type>http_get</type>
+        <node type='http_get'>
             <host>127.0.0.1</host>
             <port>8000</port>
             <parameters>
                 <parameter name="path">sample_command.html</parameter>
             </parameters>
         </node>
-        <node>
-            <type>http_get</type>
+        <node type='http_get'>
             <host>127.0.0.1</host>
             <port>8090</port>
             <parameters>

