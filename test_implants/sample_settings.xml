@@ -1,0 +1,84 @@
+<root>
+    <nodes>
+        <node>
+            <type>http_get</type>
+            <host>127.0.0.1</host>
+            <port>8080</port>
+            <parameters>
+                <parameter name="path">sample_command.html</parameter>
+            </parameters>
+        </node>
+        <node>
+            <type>http_get</type>
+            <host>127.0.0.1</host>
+            <port>8000</port>
+            <parameters>
+                <parameter name="path">sample_command.html</parameter>
+            </parameters>
+        </node>
+        <node>
+            <type>http_get</type>
+            <host>127.0.0.1</host>
+            <port>8090</port>
+            <parameters>
+                <parameter name="path">sample_command.html</parameter>
+            </parameters>
+        </node>
+    </nodes>
+    <behaviors>
+        <beaconing_activity>
+            <min_sleep>60</min_sleep>
+            <max_sleep>600</max_sleep>
+            <active_days>
+                <day>M</day>
+                <day>Tu</day>
+                <day>W</day>
+                <day>Th</day>
+                <day>F</day>
+                <day>Sa</day>
+                <day>Su</day>
+            </active_days>
+            <active_hours>
+                <low_hour>0001</low_hour>
+                <high_hour>2359</high_hour>
+            </active_hours>
+        </beaconing_activity>
+    </behaviors>
+    <!-- Used for generating the handler maps and the pyinstaller import file -->
+    <modules>
+        <beacons>
+            <beacon>
+                <type>http_get</type>
+            </beacon>
+        </beacons>
+        <commands>
+            <command>
+                <type>shell_command</type>
+            </command>
+             <command>
+                <type>test_command</type>
+            </command>
+        </commands>
+        <encoders>
+            <encoder order="1">
+                <type>base64c</type>
+            </encoder>
+            <encoder order="2">
+                <type>rot13</type>
+            </encoder>
+            <encoder order="3">
+                <type>jsonc</type>
+            </encoder>
+        </encoders>
+        <decoders>
+            <!--<decoder>-->
+            <!--    <type></type>-->
+            <!--</decoder>-->
+        </decoders>
+        <responders>
+            <!--<responder>-->
+            <!--    <type></type>-->
+            <!--</responder>-->
+        </responders>
+    </modules>
+</root>

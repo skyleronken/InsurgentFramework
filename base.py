@@ -14,6 +14,7 @@ from random import randint
 # - Add active day and active hour calculation to calculate_sleep()
 # - Get a GUID based off of MAC/IP/PC Name
 # - Move global values into an xml/plist type file for persistent changes from C2 node.
+# - Create a tracking mechanism for threads started by commands from previous orders
 #
 # READ:
 # - http://docs.python-guide.org/en/latest/shipping/freezing/
