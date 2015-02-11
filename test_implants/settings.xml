@@ -23,10 +23,10 @@
         </node>
     </nodes>
     <behaviors>
-        <beaconing_activity>
+        <activity>
             <min_sleep>60</min_sleep>
             <max_sleep>600</max_sleep>
-            <active_days>
+            <days>
                 <day>M</day>
                 <day>Tu</day>
                 <day>W</day>
@@ -34,12 +34,12 @@
                 <day>F</day>
                 <day>Sa</day>
                 <day>Su</day>
-            </active_days>
-            <active_hours>
+            </days>
+            <hours>
                 <low_hour>0001</low_hour>
                 <high_hour>2359</high_hour>
-            </active_hours>
-        </beaconing_activity>
+            </hours>
+        </activity>
     </behaviors>
     <!-- Used for generating the handler maps and the pyinstaller import file -->
     <modules>
