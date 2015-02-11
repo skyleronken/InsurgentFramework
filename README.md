@@ -18,5 +18,8 @@ A framework for creating modular implants to be used in training environments
 <h6>Milestones:</h6>
 <i>
 1/15/2015 - Dynamic Importer and beaconing handler verified
+<br>
 2/9/2015 - The controller works; albeit needs some documenting (DOCSTRINGS) and testing.
+<br>
+2/11/2015 - All configurations are now parsed from XML settings file.
 </i>
