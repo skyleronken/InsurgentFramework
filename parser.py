@@ -51,14 +51,10 @@ def parse_nodes(xml):
         
     if len(nodes_list) > 0:
         config.NODES = nodes_list
-        print config.NODES
         return True
     else:
         return False
         
-
-
-
 def parse_activity_rules(xml):
     
     """
@@ -102,5 +98,63 @@ def parse_behaviors(xml):
     except:
         print '%s Error parsing behaviors' % (config.PROMPT)
         raise
+
+def parse_abstract_type_module(xml):
+    """
+    this function is called to parse the modules within the different module tags
+    """
+    parsed_modules = []
+    # get all module objects
+    for module in xml.findall(config.MOD_T):
+        mod_type = module.find(config.MOD_TYPE_T).text
+        mod_order = int(module.attrib.get(config.MOD_ORDER_T, -1)) # if no order attribute is defined, default to False.
+        
+        # if there is an order defined, put it into the list at the appropriate index. 
+        # Order of definitions should'nt matter as long as you start at 1, not 0 index.
+        if mod_order:
+            parsed_modules.insert(mod_order,mod_type)
+        else:
+            parsed_modules.append(mod_type)
+    return parsed_modules
     
-    return True
+def parse_beacons(xml):
+    """ parses beacon modules """
+    beacons = parse_abstract_type_module(xml)
+    config.BEACONS = beacons
+
+def parse_decoders(xml):
+    """ parses decoders"""
+    
+    decoders = parse_abstract_type_module(xml)
+    config.DECODERS = decoders
+
+def parse_commands(xml):
+    """ parses commands """
+    
+    commands = parse_abstract_type_module(xml)
+    config.COMMANDS = commands
+
+def parse_encoders(xml):
+    """ parses encoders """
+    encoders = parse_abstract_type_module(xml)
+    config.ENCODERS = encoders
+
+def parse_responders(xml):
+    """ pares responders """
+    
+    responders = parse_abstract_type_module(xml)
+    config.RESPONDERS = responders
+    
+def parse_modules(xml):
+    """
+    Run the parsers for all of the modules.
+    """
+    try:
+        parse_beacons(xml.find(config.BEACONS_MOD_T))
+        parse_decoders(xml.find(config.DECODERS_MOD_T))
+        parse_commands(xml.find(config.COMMANDS_MOD_T))
+        parse_encoders(xml.find(config.ENCODERS_MOD_T))
+        parse_responders(xml.find(config.RESPONDERS_MOD_T))
+    except:
+        print '%s Error parsing modules' % (config.PROMPT)
+        raise

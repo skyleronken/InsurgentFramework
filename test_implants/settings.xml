@@ -44,38 +44,38 @@
     <!-- Used for generating the handler maps and the pyinstaller import file -->
     <modules>
         <beacons>
-            <beacon>
+            <module>
                 <type>http_get</type>
-            </beacon>
+            </module>
         </beacons>
         <commands>
-            <command>
+            <module>
                 <type>shell_command</type>
-            </command>
-             <command>
+            </module>
+             <module>
                 <type>test_command</type>
-            </command>
+            </module>
         </commands>
-        <encoders>
-            <encoder order="1">
-                <type>base64c</type>
-            </encoder>
-            <encoder order="2">
-                <type>rot13</type>
-            </encoder>
-            <encoder order="3">
-                <type>jsonc</type>
-            </encoder>
-        </encoders>
         <decoders>
-            <!--<decoder>-->
-            <!--    <type></type>-->
-            <!--</decoder>-->
+            <module order="1">
+                <type>base64c</type>
+            </module>
+            <module order="2">
+                <type>rot13</type>
+            </module>
+            <module order="3">
+                <type>jsonc</type>
+            </module>
         </decoders>
-        <responders>
-            <!--<responder>-->
+        <encoders>
+            <!--<module>-->
             <!--    <type></type>-->
-            <!--</responder>-->
+            <!--</module>-->
+        </encoders>
+        <responders>
+            <!--<module>-->
+            <!--    <type></type>-->
+            <!--</module>-->
         </responders>
     </modules>
 </root>

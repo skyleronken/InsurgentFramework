@@ -20,13 +20,29 @@ DAYS_TAG = 'days'
 HOURS_TAG = 'hours'
 L_HOUR_T = 'low_hour'
 H_HOUR_T = 'high_hour'
+MODULES_TAG = 'modules'
+MOD_T = 'module'
+BEACONS_MOD_T = 'beacons'
+COMMANDS_MOD_T = 'commands'
+DECODERS_MOD_T = 'decoders'
+ENCODERS_MOD_T = 'encoders'
+RESPONDERS_MOD_T = 'responders'
+MOD_TYPE_T = 'type'
+MOD_ORDER_T = 'order'
+
 
 # Default Behaviors
 MIN_SLEEP_INT = 60 # default
 MAX_SLEEP_INT = 60 # default
 ACTIVE_DAYS = ('M','T','W','Th','F','Sa','Su') # default
 ACTIVE_HOURS = ('0001','2359') # default
+
 NODES = None
+BEACONS = None
+DECODERS = None
+COMMANDS = None
+ENCODERS = None
+RESPONDERS = None
 
 CONTINUE_BEACON = True
 

