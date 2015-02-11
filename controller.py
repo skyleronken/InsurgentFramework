@@ -192,9 +192,11 @@ class Controller:
         
         try:
             
+            #If string or full_body flag is set, apply the codec to the entire body of data
             if isinstance(encoded_data,basestring) or full_body:
                 decoded_data.append(decoder(encoded_data))
-                #return success, decoded_data
+
+            # if its a dictionary, apply codec to the key and also the value. If the value is a container, call recursive decoder.
             elif type(encoded_data) is dict:
                 
                     decoded_portion = {}
@@ -210,7 +212,7 @@ class Controller:
                         decoded_portion[decoded_key] = decoded_value
 
                     decoded_data.append(decoded_portion)
-                    
+            # If the contents is a list or tuple, recursively decode each element by sending itself to the function
             elif type(encoded_data) is list or type(encoded_data) is tuple:
 
                 for encoded_portion in encoded_data:
@@ -421,7 +423,7 @@ class Controller:
         This facade method is used to start the beaconing process
         """
         result = self.handle(nodes)
-        print "%s Beaconing iteration %s" % config.BASIC_PROMPT,("FAILED", "SUCCEEDED")[result])
+        print "%s Beaconing iteration %s" % (config.BASIC_PROMPT,("FAILED", "SUCCEEDED")[result])
         return result
     
     
