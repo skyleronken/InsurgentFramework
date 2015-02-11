@@ -30,6 +30,23 @@ RESPONDERS_MOD_T = 'responders'
 MOD_TYPE_T = 'type'
 MOD_ORDER_T = 'order'
 
+# Controller keys and indecies
+CMD_SUCC_KEY = 'success'
+CMD_RES_KEY = 'results'
+CMD_NAME_KEY = 'command'
+CMD_ARGS_KEY = 'args'
+NODE_IP_KEY = 'node'
+NODE_PORT_KEY = 'port'
+BEACON_TYPE_IND = 0
+PARAMS_IND = 1
+
+# Controller paths to modules
+MODULE_PATH = 'implant_modules'
+BEACON_PKG = MODULE_PATH + '.' + 'beacons'
+COMMAND_PKG = MODULE_PATH + '.' +'commands'
+DECODER_PKG = MODULE_PATH + '.' +'codecs'
+ENCODER_PKG = MODULE_PATH + '.' + 'codecs'
+RESPONDER_PKG = MODULE_PATH + '.' + 'beacons'
 
 # Default Behaviors
 MIN_SLEEP_INT = 60 # default
@@ -37,6 +54,7 @@ MAX_SLEEP_INT = 60 # default
 ACTIVE_DAYS = ('M','T','W','Th','F','Sa','Su') # default
 ACTIVE_HOURS = ('0001','2359') # default
 
+# Modules
 NODES = None
 BEACONS = None
 DECODERS = None
@@ -44,6 +62,18 @@ COMMANDS = None
 ENCODERS = None
 RESPONDERS = None
 
+# Flags
 CONTINUE_BEACON = True
 
+# Prompts
 PROMPT = "[]>"
+PROMP_SEP = "->"
+PROMP_BASE = "[Controller"
+PROMP_END = "]>"
+BASIC_PROMPT = PROMP_BASE + PROMP_END
+BEAC_PROMPT = PROMP_BASE + PROMP_SEP + 'Beaconer' + PROMP_END
+DEC_PROMPT = PROMP_BASE + PROMP_SEP + 'Decoder' + PROMP_END
+CMD_PROMPT = PROMP_BASE + PROMP_SEP + 'Commander' + PROMP_END
+ENC_PROMPT = PROMP_BASE + PROMP_SEP + 'Encoder' + PROMP_END
+RESP_PROMPT = PROMP_BASE + PROMP_SEP + 'Responder' + PROMP_END
+COD_PROMPT = None

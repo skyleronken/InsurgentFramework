@@ -35,8 +35,8 @@ def parse_nodes(xml):
         
             # create a dictionary containing the ip/host and port. the rest of the parameters are provided later. This is the bare minimum.
             n_dict = {}
-            n_dict[NODE_PORT_KEY] = n.find(config.N_PORT_T).text
-            n_dict[NODE_IP_KEY] = n.find(config.N_HOST_T).text
+            n_dict[config.NODE_PORT_KEY] = n.find(config.N_PORT_T).text
+            n_dict[config.NODE_IP_KEY] = n.find(config.N_HOST_T).text
             
         except:
             print '%s Nodes must provide a type, host/ip and port at minimum' % (config.PROMPT)
