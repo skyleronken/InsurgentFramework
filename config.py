@@ -42,11 +42,24 @@ PARAMS_IND = 1
 
 # Controller paths to modules
 MODULE_PATH = 'implant_modules'
-BEACON_PKG = MODULE_PATH + '.' + 'beacons'
-COMMAND_PKG = MODULE_PATH + '.' +'commands'
-DECODER_PKG = MODULE_PATH + '.' +'codecs'
-ENCODER_PKG = MODULE_PATH + '.' + 'codecs'
-RESPONDER_PKG = MODULE_PATH + '.' + 'beacons'
+BEACON_MODULE = 'beacons'
+COMMAND_MODULE = 'commands'
+DECODER_MODULE = 'codecs'
+ENCODER_MODULE = 'codecs'
+RESPONDER_MODULE = 'beacons'
+BEACON_PKG = MODULE_PATH + '.' + BEACON_MODULE
+COMMAND_PKG = MODULE_PATH + '.' + COMMAND_MODULE
+DECODER_PKG = MODULE_PATH + '.' + DECODER_MODULE
+ENCODER_PKG = MODULE_PATH + '.' + ENCODER_MODULE
+RESPONDER_PKG = MODULE_PATH + '.' + RESPONDER_MODULE
+
+# Parent ABC
+BEACON_ABC = 'beacon'
+COMMAND_ABC = 'command'
+DECODER_ABC = 'codec'
+ENCODER_ABC = 'codec'
+RESPONDR_ABC = 'beacon'
+
 
 # Default Behaviors
 MIN_SLEEP_INT = 60 # default

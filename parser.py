@@ -1,6 +1,6 @@
 import config
 import xml.etree.ElementTree as ET
-from controller import NODE_PORT_KEY, NODE_IP_KEY
+from sys import exit
 
 def get_xml(config_filename):
     

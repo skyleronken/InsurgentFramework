@@ -10,7 +10,7 @@ from implant_modules.command_object import CommandObject
 from implant_modules.order import Order
 
 # TODO:
-#
+# - Add a transform method which allows the settings XML document to define the 'key' for commands and their KVP parameters. This will need to be a transform of the command handler that occurs AFTER the imports.
 # - Considering wrapping each node into a Node class upon initial import.
 # - Fix easy_import and abstract_builder so you can hand it a list of the modules for a package (beacons, commands, etc), since the import can receive a list. More efficient.
 # - Consider change command modules from {cmd:params} to (cmd, params) tuple. Better utilizes types to separate data. 
@@ -55,11 +55,11 @@ class Controller:
         """
         try:
             pkg = __import__(pkg_name, fromlist=[module_name])
-            module = getattr(pkg,module_name)
-            return self.get_module_class(module)
         except ImportError ,e:
             print "Erorr importing %s from %s" % (module_name, pkg_name)
             raise
+        module = getattr(pkg,module_name)
+        return self.get_module_class(module)
     
     def abstract_builder(self, pkg_name, name_list, return_list = False):
         """

