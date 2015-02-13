@@ -35,7 +35,8 @@ class Controller:
     # UTILITIES
     # ###############
     
-    def get_module_class(self, module):
+    @staticmethod
+    def get_module_class(module):
         """
         gets the class object of the module .py file
         """
@@ -49,7 +50,8 @@ class Controller:
             print "Error getting class from %s module" % (module.__name__)
             raise
 
-    def easy_import(self, pkg_name, module_name):
+    @staticmethod
+    def easy_import(pkg_name, module_name):
         """
         Dynamically imports a class from a given module
         """
@@ -59,9 +61,10 @@ class Controller:
             print "Erorr importing %s from %s" % (module_name, pkg_name)
             raise
         module = getattr(pkg,module_name)
-        return self.get_module_class(module)
+        return Controller.get_module_class(module)
     
-    def abstract_builder(self, pkg_name, name_list, return_list = False):
+    @staticmethod
+    def abstract_builder(pkg_name, name_list, return_list = False):
         """
         This function will build lists or dictionaries of modules to be used by the controller's handlers
         """
@@ -76,7 +79,7 @@ class Controller:
         # so we can instantiate the appropriate instance when going through a beaconing interation.
         for module_name in name_list:
 
-            module_class = self.easy_import(pkg_name, module_name) # imports the class
+            module_class = Controller.easy_import(pkg_name, module_name) # imports the class
             if return_list:
                 ret_val.append(module_class) # adds the Class object to a list
             else:
@@ -93,19 +96,19 @@ class Controller:
     # Hence, I am using a ludicrous number of functions and facades.
     
     def build_beacon_handler(self, beacons):
-        self.beacon_map = self.abstract_builder(config.BEACON_PKG, beacons)
+        self.beacon_map = Controller.abstract_builder(config.BEACON_PKG, beacons)
 
     def build_command_handler(self, commands):
-        self.command_map = self.abstract_builder(config.COMMAND_PKG, commands)
+        self.command_map = Controller.abstract_builder(config.COMMAND_PKG, commands)
     
     def build_decoder_handler(self, decoders):
-        self.decoder_list = self.abstract_builder(config.DECODER_PKG, decoders, True) #return a list
+        self.decoder_list = Controller.abstract_builder(config.DECODER_PKG, decoders, True) #return a list
         
     def build_encoder_handler(self, encoders):
-        self.encoder_list = self.abstract_builder(config.ENCODER_PKG, encoders, True) #return a list
+        self.encoder_list = Controller.abstract_builder(config.ENCODER_PKG, encoders, True) #return a list
         
     def build_responder_handler(self, responders):
-        self.response_map = self.abstract_builder(config.RESPONDER_PKG, responders)
+        self.response_map = Controller.abstract_builder(config.RESPONDER_PKG, responders)
     
     def build_handlers(self, beacons, commands, decoders, encoders, responders):
         # this function is used by the constructor to setup the dictionaries with the command to command object mapping.
