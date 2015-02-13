@@ -6,8 +6,12 @@ import os
 from subprocess import Popen, PIPE
 from tempfile import NamedTemporaryFile
 import xml.etree.ElementTree as ET
+from argparse import ArgumentParser
 
 def parse_module_types(xml, pkg):
+    """
+    Parses the xml configuration to determine dynamic import modules
+    """
     
     modules_list = [pkg]
 
@@ -17,31 +21,28 @@ def parse_module_types(xml, pkg):
     
     return modules_list
 
-def main():
+def main(project_name, settings_file, framework_location, working_dir):
     
-    ########################
-    # Parse Arguments here #
-    ########################
+    base_location = framework_location + os.path.sep + "base.py"
     
-    framework_location = "/home/ubuntu/workspace/"
-    base_location = framework_location + "base.py"
-    settings_file_name = "settings.xml"
-    settings_file = framework_location + settings_file_name
+    settings_file_name = settings_file.split(os.path.sep)[-1]
+
     hooks_dir = list()
     hooks_dir.append(framework_location + "hooks")
     
     working_dirs = list()
-    working_dirs.append("/tmp/")
-    project_name = "testbot"
-    
+    working_dirs.append(working_dir)
+
     debug = "False"
     strip = "None"
     upx = "True"
     console = "True"
-    
+
     #######################################
     # Parse settings for required modules #
     #######################################
+    
+    print "%s Parsing %s" % (config.PROMPT, settings_file)
     
     xmltree = ET.parse(settings_file)
     xmlroot = xmltree.getroot()
@@ -57,8 +58,9 @@ def main():
     # Build Hidden Imports for PyInstaller #
     ########################################
     
+    print "%s Compiling hidden imports" % (config.PROMPT)
+    
     modules_to_import = beacon_types + decoder_types + command_types + encoder_types + responder_types
-    modules_to_import = modules_to_import + [config.BEACON_ABC, config.COMMAND_ABC, config.DECODER_ABC, config.ENCODER_ABC, config.RESPONDR_ABC]
     modules_to_import = list(set(modules_to_import)) # remove duplicates
     hidden_imports = str(modules_to_import)
     
@@ -72,6 +74,8 @@ def main():
     # Make Spec File #
     ##################
     
+    print "%s Making .spec file" % (config.PROMPT)
+    
     spec_file = NamedTemporaryFile(suffix=".spec",delete=False)
     
     spec_file.write("# -*- mode: python -*-%s" % os.linesep)
@@ -83,17 +87,17 @@ def main():
     spec_file.flush()
     spec_file.seek(0)
     
-    #print spec_file.name
-    #print spec_file.read()
-    
     spec_file.close()
 
     ####################
     # Build Executable #
     ####################
+    
+    print "%s Building executable" % (config.PROMPT)
 
     make_cmd_line = []
     make_cmd_line.append("pyinstaller")
+    make_cmd_line.append("--log-level=WARN")
     make_cmd_line.append(spec_file.name)
     
     results = Popen(make_cmd_line, stdout=PIPE).communicate()[0]
@@ -102,8 +106,16 @@ def main():
     #################
     # Cleanup Build #
     #################
+    print "%s Cleaning up!" % (config.PROMPT)
     os.remove(spec_file.name)
 
 
 if __name__ == "__main__":
-    main()
+    
+    ap = ArgumentParser(prog='build',description='Build portable, modular bots')
+    ap.add_argument('-w','--working_dir', dest='working_dir', nargs='?', default=os.path.dirname(os.path.realpath(__file__)), help='The location where you want your working file and output to be stored.')
+    ap.add_argument('-l','--location', dest='framework_location',nargs='?', default=os.path.dirname(os.path.realpath(__file__)), help="The location of the framework's main directory.")
+    ap.add_argument('-s','--settings', dest='settings_file',nargs='?', default='settings.xml', required=True, help="The absolute path of the settings XML file from which to create your bot.")
+    ap.add_argument('name', help="The desired name of the bot.")
+    parsed_args = ap.parse_args()
+    main(parsed_args.name, parsed_args.settings_file, parsed_args.framework_location, parsed_args.working_dir)

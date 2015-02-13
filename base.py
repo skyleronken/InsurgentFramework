@@ -5,7 +5,7 @@ from controller import Controller
 import time
 from random import randint
 import sys
-from parser import *
+from settings_parser import *
 
 #
 # Overall configurations should include:
