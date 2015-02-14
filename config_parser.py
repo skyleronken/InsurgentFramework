@@ -119,42 +119,44 @@ def parse_abstract_type_module(xml):
     
 def parse_beacons(xml):
     """ parses beacon modules """
+    xml = xml.find(config.BEACONS_MOD_T)
     beacons = parse_abstract_type_module(xml)
-    config.BEACONS = beacons
+    return beacons
 
 def parse_decoders(xml):
     """ parses decoders"""
-    
+    xml = xml.find(config.DECODERS_MOD_T)
     decoders = parse_abstract_type_module(xml)
-    config.DECODERS = decoders
+    return decoders
 
 def parse_commands(xml):
     """ parses commands """
-    
+    xml = xml.find(config.COMMANDS_MOD_T)
     commands = parse_abstract_type_module(xml)
-    config.COMMANDS = commands
+    return commands
 
 def parse_encoders(xml):
     """ parses encoders """
+    xml = xml.find(config.ENCODERS_MOD_T)
     encoders = parse_abstract_type_module(xml)
-    config.ENCODERS = encoders
+    return encoders
 
 def parse_responders(xml):
     """ pares responders """
-    
+    xml = xml.find(config.RESPONDERS_MOD_T)
     responders = parse_abstract_type_module(xml)
-    config.RESPONDERS = responders
+    return responders
     
 def parse_modules(xml):
     """
     Run the parsers for all of the modules.
     """
     try:
-        parse_beacons(xml.find(config.BEACONS_MOD_T))
-        parse_decoders(xml.find(config.DECODERS_MOD_T))
-        parse_commands(xml.find(config.COMMANDS_MOD_T))
-        parse_encoders(xml.find(config.ENCODERS_MOD_T))
-        parse_responders(xml.find(config.RESPONDERS_MOD_T))
+        config.BEACONS = parse_beacons(xml)
+        config.DECODERS = parse_decoders(xml)
+        config.COMMANDS = parse_commands(xml)
+        config.ENCODERS = parse_encoders(xml)
+        config.RESPONDERS = parse_responders(xml)
     except:
         print '%s Error parsing modules' % (config.PROMPT)
         raise

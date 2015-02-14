@@ -96,27 +96,27 @@ class Controller:
     # Hence, I am using a ludicrous number of functions and facades.
     
     def build_beacon_handler(self, beacons):
-        self.beacon_map = Controller.abstract_builder(config.BEACON_PKG, beacons)
+        return Controller.abstract_builder(config.BEACON_PKG, beacons)
 
     def build_command_handler(self, commands):
-        self.command_map = Controller.abstract_builder(config.COMMAND_PKG, commands)
+        return Controller.abstract_builder(config.COMMAND_PKG, commands)
     
     def build_decoder_handler(self, decoders):
-        self.decoder_list = Controller.abstract_builder(config.DECODER_PKG, decoders, True) #return a list
+        return Controller.abstract_builder(config.DECODER_PKG, decoders, True) #return a list
         
     def build_encoder_handler(self, encoders):
-        self.encoder_list = Controller.abstract_builder(config.ENCODER_PKG, encoders, True) #return a list
+        return Controller.abstract_builder(config.ENCODER_PKG, encoders, True) #return a list
         
     def build_responder_handler(self, responders):
-        self.response_map = Controller.abstract_builder(config.RESPONDER_PKG, responders)
+        return Controller.abstract_builder(config.RESPONDER_PKG, responders)
     
     def build_handlers(self, beacons, commands, decoders, encoders, responders):
         # this function is used by the constructor to setup the dictionaries with the command to command object mapping.
-        self.build_beacon_handler(beacons)
-        self.build_command_handler(commands)
-        self.build_decoder_handler(decoders)
-        self.build_encoder_handler(encoders)
-        self.build_responder_handler(responders)
+        self.beacon_map = self.build_beacon_handler(beacons)
+        self.command_map = self.build_command_handler(commands)
+        self.decoder_list = self.build_decoder_handler(decoders)
+        self.encoder_list = self.build_encoder_handler(encoders)
+        self.response_map = self.build_responder_handler(responders)
     
     # ###############
     # HANDLER CALLERS
