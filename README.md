@@ -10,12 +10,30 @@ A framework for creating modular implants to be used in training environments
 <li>Forensically Sound</li>
 </ol>
 
-<h5>Ideas</h5>
+<h5>Todo</h5>
 <ul>
+<li> Implement a Command Object: modify the handler to convert decoded data to Command Objects, modify handle_command to handle appropriately.</li>
+<li> Have results go back to the Command Object, and the responses parsed from the Command Object accordingly to be handed to the encoder.</li>
 <li> Beahviors modules. i.e: What to do when no nodes can be contacted; chunking up response data; chunking responses to occur per command or per beacon;</li>
+<li> Prevent replays </li>
+<li> Add active day and active hour calculation to calculate_sleep()</li>
+<li> Add a GUID for the bot type; defined in the settings xml</li>
+<li> Get a GUID for the bot based off of MAC/IP/PC Name</li>
+<li> Ability to alter content of packaged XML content for PERSISTENT changes from C2 node. (don't know if this is possible)</li>
+<li> Create a tracking mechanism for threads started by commands from previous orders</li>
+<li> Create a web GUI for building commands. Should intelligently knowh that command modules' requirements.</li>
+<li> Add a server generating framework. Should be able to intelligently task bots, track respones, etc.</li>
+<li> Add a transform method which allows the settings XML document to define the 'key' for commands and their KVP parameters. This will need to be a transform of the command handler that occurs AFTER the imports.</li>
+<li> Considering wrapping each node into a Node class upon initial import.</li>
+<li> Fix easy_import and abstract_builder so you can hand it a list of the modules for a package (beacons, commands, etc), since the import can receive a list. More efficient.</li>
+<li> Consider change command modules from {cmd:params} to (cmd, params) tuple. Better utilizes types to separate data. </li>
+<li> more flexible designation of where to send the results/responses</li>
+<li> Add behaviors as modules</li>
+<li> make the sending of results/responses optional</li>
+<li> make the results sending have an option of be dependant upon the command (i.e each command results can be sent somewhere different, or not at all, etc)</li>
 </ul>
 
-<h6>Milestones:</h6>
+<h5>Milestones:</h5>
 <i>
 1/15/2015 - Dynamic Importer and beaconing handler verified
 <br>
@@ -40,25 +58,25 @@ Dependencies
 Other dependencies will be required by specific modules
 
 <h6>Notes: </h6>
-I had to modify pyinstaller to get it to recursively analyze dynamically imported modules' dependencies.<br>
+I had to modify pyinstaller to get it to recursively analyze dynamically imported modules' dependencies.<br><br>
 If not building pyinstaller from their Git repo, make sure you make the change manually: <br>
 https://github.com/pyinstaller/pyinstaller/commit/e9575e1145718ecc49625b782cee7cbb41d8522b
 
-<h5>
+<h4>
 Installation
-</h5>
+</h4>
 
-<h5>
+<h4>
 Usage
-</h5>
+</h4>
 
-<h6>Build.py</h6>
+<h5>Build.py</h5>
 python build.py -h
 
-<h6>Translator.py</h6>
+<h5>Translator.py</h5>
 python translator.py -h
 
-<h6>Base.py</h6>
+<h5>Base.py</h5>
 It is not recommended to use base.py for testing purposes because most errors are likely to occur within the importing.
 However, if you are trying to test the module and don't want to worry about resolving pyinstaller import errors, you can
 run 'base.py'. Just make sure you settings.xml file is present in the root directory of the framework and has the same

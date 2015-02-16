@@ -6,23 +6,7 @@ import time
 from random import randint
 import sys
 from config_parser import *
-
-#
-# Overall configurations should include:
-# - XML to be parsed by Python to provide Strings of available modules
-# - A pyinstaller
-#
-# TODO:
-# - Prevent replays
-# - Add active day and active hour calculation to calculate_sleep()
-# - Get a GUID based off of MAC/IP/PC Name
-# - Move global values into an xml/plist type file for PERSISTENT changes from C2 node.
-# - Create a tracking mechanism for threads started by commands from previous orders
-#
-# READ:
-# - http://docs.python-guide.org/en/latest/shipping/freezing/
-# - http://stackoverflow.com/questions/13629321/handling-dynamic-import-with-py2exe
-# - http://www.pythoncentral.io/pyinstaller-package-python-applications-windows-mac-linux/
+import os
 
 def load_config():
     """

