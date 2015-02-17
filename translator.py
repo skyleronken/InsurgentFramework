@@ -2,9 +2,12 @@
 
 from argparse import ArgumentParser
 from controller import Controller
+from implant_modules.command_object import CommandObject
 import config_parser
 import config
 import sys
+import pprint
+from json import dumps, loads
 
 class Translator:
     
@@ -49,6 +52,12 @@ class Translator:
         runs the encoders exactly as the settings lay them out
         """
         return self.controller.handle_encode(data)
+        
+    def parse_to_cmd_objs(self, data):
+        """
+        loops through data and convert its to CommandObjects
+        """
+        return Controller.recursive_convert_to_cmd_objects(data)
 
 def print_header():
     header = """
@@ -73,7 +82,7 @@ def print_menu():
     """
     print menu
       
-def main(settings_file):
+def main(settings_file, full_decode):
     xml = config_parser.get_xml(settings_file)
     translator = Translator(xml)
     
@@ -103,16 +112,25 @@ def main(settings_file):
             continue
             
         print "\n\nResult:\n"
-        print result
+        
+        if full_decode and (choice == 2 or choice == 3):
+            if type(result) is tuple:
+                success, body = result
+            results_as_obj = translator.parse_to_cmd_objs(body)
+            pp = pprint.PrettyPrinter(indent=4)
+            pp.pprint(results_as_obj)
+        else:
+            print result
 
 if __name__ == "__main__":
     
     ap = ArgumentParser(prog='translator',description='Encode commands and decode responses interactively')
     ap.add_argument('-s','--settings', dest='settings_file',nargs='?', default='settings.xml', required=True, help="The absolute path of the settings XML file from which you created your bot.")
+    ap.add_argument('-f','--full', dest='full_decode', action='store_true', required=False, help="When decoding, fully decode in Command Objects.")
     parsed_args = ap.parse_args()
     
     try:
-        main(parsed_args.settings_file)
+        main(parsed_args.settings_file, parsed_args.full_decode)
         sys.exit(0)
     except (KeyboardInterrupt, SystemExit):
         print config.PROMPT + " Exiting"

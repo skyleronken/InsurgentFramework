@@ -1,6 +1,7 @@
 
 import config
 import copy
+import ast
 
 FULL_DICT = 1
 SHORT_DICT = 2
@@ -38,8 +39,13 @@ class CommandObject(object):
         """
         if (data is not None):
             try:
-                if type(data) is str:
-                    
+                found = False
+                
+                if (type(data) is str or type(data) is unicode) and data[0] == '{':
+                    # convert a textual version of a dictionary into a dict data type
+                    # I don't really like this, but don't know any way around it...
+                    data = ast.literal_eval(data)
+                elif type(data) is str or type(data) is unicode:
                     #Check to see if this string has spaces, or other possibly delimiting characters.
                     if data.isalnum():
                         #its just a singple alphanumeric word. Add it as the command name and thats it.
@@ -56,7 +62,7 @@ class CommandObject(object):
                         split_data = [ x.strip() for x in split_data ] # remove trailing and leading white space that may exist
                         
                         if split_data[0][0].isalnum(): # is there an args delimeter set?
-                            self.args = split_data.strip # Nope, set the args to be the rest of the data
+                            self.args = split_data # Nope, set the args to be the rest of the data
                             self.format_type = DELIM_LIST
                         else:
                             self.args_delimeter = split_data[0].pop(0) # Yes! Save it and remove it.
@@ -66,9 +72,9 @@ class CommandObject(object):
                                 self.args[s_arg[0]] = s_arg[1] # Add it to a dictionary
                                 
                             self.format_type = DELIM_DICT
-                            
-                elif type(data) is dict:
-                    
+                    found = True
+                
+                if type(data) is dict:
                     self.name = data.get(config.CMD_NAME_KEY, None)
                     self.args = data.get(config.CMD_ARGS_KEY, None)
                     self.results = data.get(config.CMD_RES_KEY, None) # check to see if this is a parsed result
@@ -80,10 +86,13 @@ class CommandObject(object):
                             self.name = name
                             self.args = args
                         self.format_type = SHORT_DICT
+                        
+                    found = True
     
-                else:
-                    print "Could not construct using %s" % data
+                if not found:
+                    print "Could not construct using %s %s" % (data,type(data))
                     raise
+                
             except Exception, e:
                 print "%s %s" % (e, data)
                 raise
@@ -221,3 +230,10 @@ class CommandObject(object):
             res_string = str(d)
 
         return res_string
+        
+    def __repr__(self):
+        ret_val = ""
+        for k, v in vars(self).items():
+            if v is not None:
+                ret_val += "%s : %s\n" % (k, v)
+        return ret_val
