@@ -12,8 +12,6 @@ A framework for creating modular implants/bots to be used in training environmen
 
 <h5>Todo</h5>
 <ul>
-<li> CommandObject - to_string method, to allow the building of CommandObjects manually and than transformed into a string for sending.
-<li> Have results go back to the CommandObject, and the responses parsed from the CommandObject accordingly to be handed to the encoder.</li>
 <li> Beahviors modules. i.e: What to do when no nodes can be contacted; chunking up response data; chunking responses to occur per command or per beacon;</li>
 <li> Prevent replays </li>
 <li> Add active day and active hour calculation to calculate_sleep()</li>
@@ -29,6 +27,7 @@ A framework for creating modular implants/bots to be used in training environmen
 <li> more flexible designation of where to send the results/responses</li>
 <li> make the sending of results/responses optional</li>
 <li> make the results sending have an option of be dependant upon the command (i.e each command results can be sent somewhere different, or not at all, etc)</li>
+<li> Consider making CommandObject results data into a Results object.
 </ul>
 
 <h5>Milestones:</h5>

