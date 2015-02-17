@@ -1,5 +1,6 @@
 
 import config
+from json import dumps
 
 class CommandObject(object):
     
@@ -65,4 +66,46 @@ class CommandObject(object):
             except Exception, e:
                 print "%s %s" % (e, data)
                 raise
+    
+    def to_string(self, short=False):
         
+        # Return simple command name string
+        if self.args is None:
+            return str(self.name)
+        
+        # return JSON dictionaries
+        elif self.delimeter is None:
+            dict_to_jsonify = {}
+            if short:
+                dict_to_jsonify[self.name] = self.args
+            else:
+                dict_to_jsonify[config.CMD_NAME_KEY] = self.name
+                dict_to_jsonify[config.CMD_ARGS_KEY] = self.args
+            
+            return dumps(dict_to_jsonify)
+        
+        # returns a string with listed arguments
+        elif type(self.args) is list or self.args_delimeter is None:
+            ret_str = str(self.delimeter)
+            ret_str += str(self.name)
+            for arg in self.args:
+                ret_str += str(self.delimeter)
+                ret_str += str(arg)
+            return ret_str
+        
+        # returns a string with KVP arguments
+        elif type(self.args) is dict and self.args_delimeter is not None:
+            ret_str = str(self.delimeter)
+            ret_str += str(self.name)
+            ret_str += str(self.delimeter)
+            ret_str += str(self.args_delimeter)
+            for key, val in self.args.items():
+                ret_str += str(key)
+                ret_str += str(self.args_delimeter)
+                ret_str += str(val)
+                ret_str += str(self.delimeter)
+            ret_str = ret_str.rstrip(self.delimeter) # remove last delimeter
+            
+            return ret_str
+        else:
+            return None
