@@ -1,5 +1,5 @@
-# Python Implant Framework
-A framework for creating modular implants/bots to be used in training environments
+# Insurgent Framework
+A framework for creating modular malware/bots to be used in training environments
 
 <h4>Priorites</h4>
 <ol>
@@ -11,23 +11,32 @@ A framework for creating modular implants/bots to be used in training environmen
 </ol>
 
 <h5>Todo</h5>
+<h6>Bot</h6>
 <ul>
 <li> Beahviors modules. i.e: What to do when no nodes can be contacted; chunking up response data; chunking responses to occur per command or per beacon;</li>
-<li> Prevent replays </li>
 <li> Add active day and active hour calculation to calculate_sleep()</li>
-<li> Add a GUID for the bot type; defined in the settings xml</li>
-<li> Get a GUID for the bot based off of MAC/IP/PC Name</li>
 <li> Ability to alter content of packaged XML content for PERSISTENT changes from C2 node. (don't know if this is possible)</li>
 <li> Create a tracking mechanism for threads started by commands from previous orders</li>
-<li> Create a web GUI for building commands. Should intelligently knowh that command modules' requirements.</li>
-<li> Add a server generating framework. Should be able to intelligently task bots, track respones, etc.</li>
-<li> Add a transform method which allows the settings XML document to define the 'key' for commands and their KVP parameters. This will need to be a transform of the command handler that occurs AFTER the imports.</li>
 <li> Wrap each node into a Node class upon initial import.</li>
-<li> Fix easy_import and abstract_builder so you can hand it a list of the modules for a package (beacons, commands, etc), since the import can receive a list. More efficient.</li>
-<li> more flexible designation of where to send the results/responses</li>
-<li> make the sending of results/responses optional</li>
+<li> Enable the sending and executing of .pyc files (serialization as well as downloading file)</li>
 <li> make the results sending have an option of be dependant upon the command (i.e each command results can be sent somewhere different, or not at all, etc)</li>
 <li> Consider making CommandObject results data into a Results object.
+</ul>
+<h6>LP</h6>
+<ul>
+<li> Add a server generating framework. Should be able to intelligently task bots, track respones, etc.</li>
+<li> Prevent replays </li>
+</ul>
+<h6>C2 Node</h6>
+<ul>
+<li> Create a web GUI for building commands. Should intelligently knowh that command modules' requirements.</li>
+<li> Consider adding an option for all communications to follow a serialization of the CommandObjects rather than custom string parsing, etc.</li>
+</ul>
+<h6>Bot Builder</h6>
+<ul>
+<li> Create a web GUI for creating XML settings files</li>
+<li> Add a GUID for the bot type; defined in the settings xml</li>
+<li> Add a transform method which allows the settings XML document to define the 'key' for commands and their KVP parameters. This will need to be a transform of the command handler that occurs AFTER the imports.</li>
 </ul>
 
 <h5>Milestones:</h5>
@@ -50,6 +59,7 @@ Dependencies
 <ul>
 <li>Python 2.7</li>
 <li>Pyinstaller</li>
+<li>Bottle</li>
 </ul>
 
 Other dependencies will be required by specific modules

@@ -7,6 +7,23 @@ from random import randint
 import sys
 from config_parser import *
 import os
+from uuid import uuid1
+
+def get_host_id():
+    """
+    Generates a UUID for the host based off of:
+    - MAC
+    
+    Currently the values are not to be reversable, as to prevent
+    forensic analysis from determining which nodes are compromised.
+    Instead, it relies upon a command to get basic information and populate
+    the C2 database accordingly.
+    
+    Because this could possibly change in the future, I am implementing as
+    a facade.
+    """
+    return uuid.uuid1
+    
 
 def load_config():
     """
@@ -25,6 +42,8 @@ def load_config():
         parse_nodes(config_xml.find(config.NODES_TAG))
         parse_behaviors(config_xml.find(config.BEHAV_TAG))
         parse_modules(config_xml.find(config.MODULES_TAG))
+        
+        config.UUID = get_host_id()
         
     except Exception, e:
         print '%s Fatal error parsing XML element - %s' % ( config.PROMPT, e)
