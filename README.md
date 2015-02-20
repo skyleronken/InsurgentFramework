@@ -50,6 +50,8 @@ A framework for creating modular malware/bots to be used in training environment
 2/12/2015 - Packing script (build.py) completed.
 <br>
 2/14/2015 - Created a translator for encoding C2 messages and decoding responses.
+<br>
+2/20/2015 - Created a command generator script.
 </i>
 
 <h5>

@@ -9,6 +9,8 @@ SIMP_STRING = 3
 DELIM_LIST = 4
 DELIM_DICT = 5
 
+ft_dict = {FULL_DICT:"Full Dictionary",SHORT_DICT:"Short Dictionary", SIMP_STRING:"Simple String", DELIM_DICT:"Delimeted Dictionary", DELIM_LIST:"Delimeted List"}
+
 class CommandObject(object):
     
     name = None
@@ -37,6 +39,7 @@ class CommandObject(object):
         but it will also take strings and single datatypes and add them into a dictionary with the key of '0'. So for all intents and purposes
         the args will make it transparent to the command modules whehter or not its a list or a dictionary.
         """
+        self.args = {}
         if (data is not None):
             try:
                 found = False
@@ -128,7 +131,7 @@ class CommandObject(object):
         # return dictionaries
         elif self.delimeter is None:
             dictionary = {}
-            if short:
+            if self.format_type == SHORT_DICT:
                 dictionary[self.name] = self.args
             else:
                 dictionary[config.CMD_NAME_KEY] = self.name
