@@ -97,8 +97,9 @@ def print_main_menu():
     [7] Set Args Delimeter
     [8] Show CommandObject Representation
     [9] Print Constructed Command String
-    [10] Run through Translator
-    [11] Exit
+    [10] Sanity Check Constructed String
+    [11] Run through Translator
+    [12] Exit
     
     """
     
@@ -142,14 +143,16 @@ def main(settings = None):
         elif choice == 9:
             print com_obj.to_string()
         elif choice == 10:
-            pass
+            str_ver = com_obj.to_string()
+            test_obj = CommandObject(str_ver)
+            print "Sanity Checked Object. Check for validity: \n"
+            print test_obj.__repr__()
         elif choice == 11:
+            pass
+        elif choice == 12:
             cont = False
         else:
             print "Incorrect option!"
-    
-    
-        
         
 if __name__ == "__main__":
     

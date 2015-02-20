@@ -60,15 +60,17 @@ class CommandObject(object):
                             self.delimeter = " "
                         split_data = data.split(self.delimeter) # split character along delimeter
                         
-                        self.name = split_data.pop(0).strip() # set the name to be the first value, while removing it from the list
-                        
+                        del split_data[0] # remove the split ""
+                        self.name = split_data.pop(0) # set the name to be the first value, while removing it from the list
+
                         split_data = [ x.strip() for x in split_data ] # remove trailing and leading white space that may exist
-                        
+
                         if split_data[0][0].isalnum(): # is there an args delimeter set?
                             self.args = split_data # Nope, set the args to be the rest of the data
                             self.format_type = DELIM_LIST
                         else:
-                            self.args_delimeter = split_data[0].pop(0) # Yes! Save it and remove it.
+                            self.args_delimeter = split_data[0][:1] # Yes! Save it and remove it.
+                            split_data[0] = split_data[0][1:]
                             self.args = {}
                             for arg in split_data: # loop through the initally delimeted data
                                 s_arg = arg.split(self.args_delimeter) # split it based on the sub delimeter
@@ -105,8 +107,9 @@ class CommandObject(object):
                 
                 if type(self.args) is list:
                     d = {}
-                    for i in len(self.args):
-                        d[i] = self.args[i]
+                    
+                    for i, arg in enumerate(self.args):
+                        d[i] = arg
                     
                     self.args = d
                     
