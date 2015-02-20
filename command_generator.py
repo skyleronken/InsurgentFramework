@@ -6,6 +6,7 @@ from controller import Controller
 import config_parser
 import config
 import sys
+from subprocess import Popen, PIPE, STDOUT
 
 def print_header():
     header = """
@@ -75,6 +76,8 @@ def set_delimeter(deli):
     print "\nCurrent Delimeter is: %s \n" % (deli)
 
     choice = raw_input("Select Delimeter: ")
+    if len(choice) == 0:
+        choice = None
     return choice
     
 def set_args_delimeter(deli):
@@ -82,6 +85,8 @@ def set_args_delimeter(deli):
     print "\nCurrent Args Delimeter is: %s \n" % (deli)
 
     choice = raw_input("Select Args Delimeter: ")
+    if len(choice) == 0:
+        choice = None
     return choice
     
 def print_main_menu():
@@ -148,7 +153,15 @@ def main(settings = None):
             print "Sanity Checked Object. Check for validity: \n"
             print test_obj.__repr__()
         elif choice == 11:
-            pass
+            p = Popen(["python","translator.py","-s",settings,"-c1"], stdout=PIPE, stdin=PIPE, stderr=STDOUT)
+            results = p.communicate(input=b'%s' % (com_obj.to_string()))[0]
+            results = results.decode()
+            results = results.splitlines()
+            success, results = eval(results[-2])
+            
+            print "Success: %r" % success
+            print "Encoded Command: %s" % results
+            
         elif choice == 12:
             cont = False
         else:

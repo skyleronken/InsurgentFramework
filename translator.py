@@ -82,9 +82,25 @@ def print_menu():
     """
     print menu
       
-def main(settings_file, full_decode):
+def main(settings_file, full_decode, codec):
     xml = config_parser.get_xml(settings_file)
     translator = Translator(xml)
+    
+    if codec is not None:
+        choice = int(codec)
+        data = raw_input()
+        result = None
+
+        if choice == 1:
+            result = translator.encode_for_sending(data)
+        elif choice == 2:
+            result = translator.decode_for_receiving(data)
+        elif choice == 3:
+            result = translator.decode_as_bot(data)
+        elif choice == 4:
+            result = translator.encode_as_bot(data)
+        print result
+        sys.exit()
     
     print_header()
     loop = True
@@ -127,10 +143,11 @@ if __name__ == "__main__":
     ap = ArgumentParser(prog='translator',description='Encode commands and decode responses interactively')
     ap.add_argument('-s','--settings', dest='settings_file',nargs='?', default='settings.xml', required=True, help="The absolute path of the settings XML file from which you created your bot.")
     ap.add_argument('-f','--full', dest='full_decode', action='store_true', required=False, help="When decoding, fully decode in Command Objects.")
+    ap.add_argument('-c','--codec', dest='codec', nargs='?', required=False, help="Don't go to the menu. Just run the appropriate codec.")
     parsed_args = ap.parse_args()
     
     try:
-        main(parsed_args.settings_file, parsed_args.full_decode)
+        main(parsed_args.settings_file, parsed_args.full_decode, parsed_args.codec)
         sys.exit(0)
     except (KeyboardInterrupt, SystemExit):
         print config.PROMPT + " Exiting"
