@@ -1,3 +1,6 @@
+# Suppress scapy import warnings
+import logging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
 import netaddr
 from command import Command
