@@ -10,6 +10,10 @@ LISTENING_HOST = "lh"
 LISTENING_PORT = "lp"
 
 class ReverseShell(Command):
+    """
+    This module will send a reverse shell to the designated host.
+    Down the road should look into being proxy aware.
+    """
     
     display_name = "Reverse Shell"
     index = {LISTENING_HOST:"Listening Host",

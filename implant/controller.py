@@ -316,7 +316,12 @@ class Controller:
                 cmd_obj = cmd_class()
                 args = command.args
                 print config.CMD_PROMPT + " Executing: %s" % (cmd_obj.name())
-                success, results = cmd_obj.execute(args)
+                try:
+                    success, results = cmd_obj.execute(args)
+                except Exception, e:
+                    # if error when running execute, just store the error as the result
+                    success = False
+                    results = e
                 
                 command.results = results
                 command.success = success

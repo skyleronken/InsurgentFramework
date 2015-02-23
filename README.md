@@ -37,6 +37,18 @@ A framework for creating modular malware/bots to be used in training environment
 <li> Add a GUID for the bot type; defined in the settings xml</li>
 <li> Add a transform method which allows the settings XML document to define the 'key' for commands and their KVP parameters. This will need to be a transform of the command handler that occurs AFTER the imports.</li>
 </ul>
+<h6>Modules</h6>
+<ul>
+<li> Keylogger </li>
+<li> Screenshot </li>
+<li> Hashdump </li>
+<li> Quick Survey </li>
+<li> Dir Walk </li>
+<li> Retrieve File </li>
+<li> Port Scan </li>
+<li> ARP Scan </li>
+<li> FTP Download </li>
+</ul>
 
 <h5>Milestones:</h5>
 <i>

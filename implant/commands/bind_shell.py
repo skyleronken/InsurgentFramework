@@ -8,6 +8,9 @@ from implant.thread_master import run_in_thread
 LISTENING_PORT = "lp"
 
 class BindShell(Command):
+    """
+    This module sets up a bind shell listener
+    """
     
     display_name = "Bind Shell"
     index = {LISTENING_PORT:"Listening Port"}

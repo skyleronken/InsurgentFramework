@@ -6,6 +6,9 @@ from command import Command
 COMMAND_LINE = "cl"
 
 class ShellCommand(Command):
+    """
+    This command will execute a command line string on the operating system
+    """
     
     display_name = "Shell Command"
     index = {COMMAND_LINE:"Command Line"}
