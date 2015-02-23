@@ -1,17 +1,18 @@
 import sys
 import os
 from subprocess import Popen, PIPE
-
 from command import Command
+
+COMMAND_LINE = "cl"
 
 class ShellCommand(Command):
     
     display_name = "Shell Command"
-    index = {"CL":"Command Line"}
+    index = {COMMAND_LINE:"Command Line"}
     
     def execute(self, args):
         
-        cmd_line = args['CL']
+        cmd_line = args[COMMAND_LINE]
         print cmd_line
         success = True
         cmd_line = cmd_line.split()
