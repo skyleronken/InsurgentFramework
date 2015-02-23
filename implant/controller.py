@@ -6,8 +6,8 @@ import config
 import inspect
 import sys
 import warnings
-from implant_modules.command_object import CommandObject
-from implant_modules.order import Order
+from command_object import CommandObject
+from order import Order
 
 class Controller:
     

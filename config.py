@@ -43,7 +43,7 @@ CMD_SUCCESS_IND = -2 # These are used when the CommandObject is parsed and trans
 CMD_RESULTS_IND = -1
 
 # Controller paths to modules
-MODULE_PATH = 'implant_modules'
+MODULE_PATH = 'implant'
 BEACON_MODULE = 'beacons'
 COMMAND_MODULE = 'commands'
 DECODER_MODULE = 'codecs'

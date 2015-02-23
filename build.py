@@ -23,7 +23,7 @@ def parse_module_types(xml, pkg):
 
 def main(project_name, settings_file, framework_location, working_dir):
     
-    base_location = framework_location + os.path.sep + "base.py"
+    base_location = framework_location + os.path.sep + config.MODULE_PATH + os.path.sep + "base.py"
     
     settings_file_name = settings_file.split(os.path.sep)[-1]
 

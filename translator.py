@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 from argparse import ArgumentParser
-from controller import Controller
-from implant_modules.command_object import CommandObject
+from implant.controller import Controller
+from implant.command_object import CommandObject
 import config_parser
 import config
 import sys
