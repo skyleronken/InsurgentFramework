@@ -24,10 +24,10 @@ class StoppableThread(threading.Thread):
         return self._stop.isSet()
         
     def run(self):
-        while not self.stopped():
+        try:
             self.target(self.args)
-        
-        return
+        except Exception, e:
+            return e
 
 def run_in_thread(func, args=None):
     if not hasattr(func, '__call__'):
