@@ -16,7 +16,6 @@ A framework for creating modular malware/bots to be used in training environment
 <li> Beahviors modules. i.e: What to do when no nodes can be contacted; chunking up response data; chunking responses to occur per command or per beacon;</li>
 <li> Add active day and active hour calculation to calculate_sleep()</li>
 <li> Ability to alter content of packaged XML content for PERSISTENT changes from C2 node. (don't know if this is possible)</li>
-<li> Create a tracking mechanism for threads started by commands from previous orders</li>
 <li> Wrap each node into a Node class upon initial import.</li>
 <li> Enable the sending and executing of .pyc files (serialization as well as downloading file)</li>
 <li> make the results sending have an option of be dependant upon the command (i.e each command results can be sent somewhere different, or not at all, etc)</li>
