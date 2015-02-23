@@ -7,12 +7,18 @@ from command import Command
 class ShellCommand(Command):
     
     display_name = "Shell Command"
+    index = {"CL":"Command Line"}
     
-    def execute(self, cmd_line):
+    def execute(self, args):
         
+        cmd_line = args['CL']
+        print cmd_line
         success = True
         cmd_line = cmd_line.split()
-        results = Popen(cmd_line, stdout=PIPE).communicate()[0]
-        
+
+        p = Popen(cmd_line, stdout=PIPE, stdin=PIPE, stderr=PIPE)
+        results = p.communicate()[0]
+        results = results.decode()
+
         return success, results
         
