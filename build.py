@@ -21,7 +21,7 @@ def parse_module_types(xml, pkg):
     
     return modules_list
 
-def main(project_name, settings_file, framework_location, working_dir):
+def main(project_name, settings_file, framework_location, working_dir, debug):
     
     base_location = framework_location + os.path.sep + config.MODULE_PATH + os.path.sep + "base.py"
     
@@ -33,7 +33,6 @@ def main(project_name, settings_file, framework_location, working_dir):
     working_dirs = list()
     working_dirs.append(working_dir)
 
-    debug = "False"
     strip = "None"
     upx = "True"
     console = "True"
@@ -63,13 +62,14 @@ def main(project_name, settings_file, framework_location, working_dir):
     modules_to_import = beacon_types + decoder_types + command_types + encoder_types + responder_types
     modules_to_import = list(set(modules_to_import)) # remove duplicates
     hidden_imports = str(modules_to_import)
-    
+
+    working_dirs.append(framework_location)
     for pkg in (config.BEACON_PKG, config.DECODER_PKG, config.ENCODER_PKG, config.COMMAND_PKG, config.RESPONDER_PKG):
         working_dirs.append(framework_location + pkg.replace(".",os.path.sep))
     
     working_dirs = list(set(working_dirs)) #remove dupes
     working_dirs = str(working_dirs)
-    
+
     ##################
     # Make Spec File #
     ##################
@@ -116,6 +116,7 @@ if __name__ == "__main__":
     ap.add_argument('-w','--working_dir', dest='working_dir', nargs='?', default=os.path.dirname(os.path.realpath(__file__)), help='The location where you want your working file and output to be stored.')
     ap.add_argument('-l','--location', dest='framework_location',nargs='?', default=os.path.dirname(os.path.realpath(__file__)), help="The location of the framework's main directory.")
     ap.add_argument('-s','--settings', dest='settings_file',nargs='?', default='settings.xml', required=True, help="The absolute path of the settings XML file from which to create your bot.")
+    ap.add_argument('-d','--debug', dest='debug', action='store_true', required=False, help="Verbose debug output.")
     ap.add_argument('name', help="The desired name of the bot.")
     parsed_args = ap.parse_args()
-    main(parsed_args.name, parsed_args.settings_file, parsed_args.framework_location, parsed_args.working_dir)
+    main(parsed_args.name, parsed_args.settings_file, parsed_args.framework_location, parsed_args.working_dir, parsed_args.debug)
