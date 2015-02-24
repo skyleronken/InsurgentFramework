@@ -5,6 +5,8 @@ This module is added for the sake of simplifying the interaction of threads runn
 Should make it easier to manage the implementation of threading command modules.
 """
 
+THREAD_KEY = 't_ref'
+
 threads = {}
 
 class StoppableThread(threading.Thread):
@@ -25,6 +27,7 @@ class StoppableThread(threading.Thread):
         
     def run(self):
         try:
+            self.args[THREAD_KEY] = self
             self.target(self.args)
         except Exception, e:
             return e
@@ -33,11 +36,14 @@ def run_in_thread(func, args=None):
     if not hasattr(func, '__call__'):
         return None
     else:
-        t = StoppableThread(func, args)
-        t.setDaemon(True)
-        t.start()
-        threads[t.getName()] = t
-        return t.getName()
+        try:
+            t = StoppableThread(func, args)
+            t.setDaemon(True)
+            t.start()
+            threads[t.getName()] = t
+            return True, t.getName()
+        except Exception, e:
+            return False, e
 
 def list_threads():
     # main_thread = threading.currentThread()

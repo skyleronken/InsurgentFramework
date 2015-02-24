@@ -24,7 +24,7 @@ class ReverseShell(Command):
         success = True
         results = ""
         
-        results = run_in_thread(send_reverse_shell,args=args)
+        success, results = run_in_thread(send_reverse_shell,args=args)
         
         return success, results
         

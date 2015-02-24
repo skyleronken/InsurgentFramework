@@ -39,15 +39,20 @@ A framework for creating modular malware/bots to be used in training environment
 </ul>
 <h6>Modules</h6>
 <ul>
-<li> Keylogger </li>
-<li> Screenshot </li>
-<li> Hashdump </li>
-<li> Quick Survey </li>
-<li> Dir Walk </li>
-<li> Retrieve File </li>
-<li> Port Scan </li>
-<li> ARP Scan </li>
-<li> FTP Download </li>
+<li> Keylogger Command </li>
+<li> Screenshot Command</li>
+<li> Hashdump Command</li>
+<li> Quick Survey Command</li>
+<li> Dir Walk Command</li>
+<li> Retrieve File Command</li>
+<li> Port Scan Command</li>
+<li> ARP Scan Command</li>
+<li> FTP Download Command</li>
+<li> DNS Beacon </li>
+<li> Git Beacon </li>
+<li> Twitter Beacon </li>
+<li> JPEG Codec </li>
+<li> XOR Codec </li>
 </ul>
 
 <h5>Milestones:</h5>

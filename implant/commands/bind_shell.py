@@ -20,7 +20,7 @@ class BindShell(Command):
         success = True
         results = ""
         
-        results = run_in_thread(setup_bind_shell,args=args)
+        success, results = run_in_thread(setup_bind_shell,args=args)
         
         return success, results
         
