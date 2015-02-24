@@ -1,9 +1,9 @@
 import threading
 
-"""
-This module is added for the sake of simplifying the interaction of threads running within the bot.
-Should make it easier to manage the implementation of threading command modules.
-"""
+#
+#This module is added for the sake of simplifying the interaction of threads running within the bot.
+#Should make it easier to manage the implementation of threading command modules.
+#
 
 THREAD_KEY = 't_ref'
 

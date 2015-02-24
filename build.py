@@ -69,6 +69,8 @@ def main(project_name, settings_file, framework_location, working_dir, debug):
     
     working_dirs = list(set(working_dirs)) #remove dupes
     working_dirs = str(working_dirs)
+    
+    runtime_opt = "('W ignore', None, 'OPTION')"
 
     ##################
     # Make Spec File #
@@ -82,7 +84,7 @@ def main(project_name, settings_file, framework_location, working_dir, debug):
     spec_file.write("a = Analysis(['%s'],pathex=%s,hiddenimports=%s,hookspath=%s,runtime_hooks=None)%s" % (base_location,working_dirs,hidden_imports,hooks_dir,os.linesep))
     spec_file.write("a.datas += [('%s','%s','DATA')]%s" % (settings_file_name, settings_file, os.linesep))
     spec_file.write("pyz = PYZ(a.pure)%s" % os.linesep)
-    spec_file.write("exe = EXE(pyz,a.scripts,a.binaries,a.zipfiles,a.datas,name='%s',debug=%s,strip=%s,upx=%s,console=%s)" % (project_name, debug, strip, upx, console))
+    spec_file.write("exe = EXE(pyz,[%s],a.scripts,a.binaries,a.zipfiles,a.datas,name='%s',debug=%s,strip=%s,upx=%s,console=%s)" % (runtime_opt,project_name, debug, strip, upx, console))
     
     spec_file.flush()
     spec_file.seek(0)
@@ -97,7 +99,11 @@ def main(project_name, settings_file, framework_location, working_dir, debug):
 
     make_cmd_line = []
     make_cmd_line.append("pyinstaller")
-    make_cmd_line.append("--log-level=WARN")
+    if debug:
+        make_cmd_line.append("--log-level=DEBUG")
+    else:
+        make_cmd_line.append("--log-level=WARN")
+    #make_cmd_line.append("--onedir")
     make_cmd_line.append(spec_file.name)
     
     results = Popen(make_cmd_line, stdout=PIPE).communicate()[0]
