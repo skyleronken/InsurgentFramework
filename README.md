@@ -1,5 +1,5 @@
 # Insurgent Framework
-A framework for creating modular malware/bots to be used in training environments
+A framework for creating modular malware/bots to be used in training environments. Please take a look at the Wiki for usage details and development guidelines.
 
 <h4>Priorites</h4>
 <ol>
@@ -9,66 +9,6 @@ A framework for creating modular malware/bots to be used in training environment
 <li>Portability</li>
 <li>Forensically Sound</li>
 </ol>
-
-<h5>Todo</h5>
-<h6>Bot</h6>
-<ul>
-<li> Beahviors modules. i.e: What to do when no nodes can be contacted; chunking up response data; chunking responses to occur per command or per beacon;</li>
-<li> Add active day and active hour calculation to calculate_sleep()</li>
-<li> Ability to alter content of packaged XML content for PERSISTENT changes from C2 node. (don't know if this is possible)</li>
-<li> Wrap each node into a Node class upon initial import.</li>
-<li> Enable the sending and executing of .pyc files (serialization as well as downloading file)</li>
-<li> make the results sending have an option of be dependant upon the command (i.e each command results can be sent somewhere different, or not at all, etc)</li>
-<li> Consider making CommandObject results data into a Results object.
-</ul>
-<h6>LP</h6>
-<ul>
-<li> Add a server generating framework. Should be able to intelligently task bots, track respones, etc.</li>
-<li> Prevent replays </li>
-</ul>
-<h6>C2 Node</h6>
-<ul>
-<li> Create a web GUI for building commands. Should intelligently knowh that command modules' requirements.</li>
-<li> Consider adding an option for all communications to follow a serialization of the CommandObjects rather than custom string parsing, etc.</li>
-</ul>
-<h6>Bot Builder</h6>
-<ul>
-<li> Create a web GUI for creating XML settings files</li>
-<li> Add a GUID for the bot type; defined in the settings xml</li>
-<li> Add a transform method which allows the settings XML document to define the 'key' for commands and their KVP parameters. This will need to be a transform of the command handler that occurs AFTER the imports.</li>
-</ul>
-<h6>Modules</h6>
-<ul>
-<li> Keylogger Command </li>
-<li> Screenshot Command</li>
-<li> Hashdump Command</li>
-<li> Quick Survey Command</li>
-<li> Dir Walk Command</li>
-<li> Retrieve File Command</li>
-<li> Port Scan Command</li>
-<li> ARP Scan Command</li>
-<li> FTP Download Command</li>
-<li> DNS Beacon </li>
-<li> Git Beacon </li>
-<li> Twitter Beacon </li>
-<li> JPEG Codec </li>
-<li> XOR Codec </li>
-</ul>
-
-<h5>Milestones:</h5>
-<i>
-1/15/2015 - Dynamic Importer and beaconing handler verified
-<br>
-2/9/2015 - The controller works; albeit needs some documenting (DOCSTRINGS) and testing.
-<br>
-2/11/2015 - All configurations are now parsed from XML settings file.
-<br>
-2/12/2015 - Packing script (build.py) completed.
-<br>
-2/14/2015 - Created a translator for encoding C2 messages and decoding responses.
-<br>
-2/20/2015 - Created a command generator script.
-</i>
 
 <h5>
 Dependencies
@@ -90,6 +30,14 @@ https://github.com/pyinstaller/pyinstaller/commit/e9575e1145718ecc49625b782cee7c
 <h4>
 Installation
 </h4>
+<p>
+Unzip the contents of the package wherever you would like to run it from.<br><br>
+pip install pyinstaller<br>
+pip install bottle<br>
+(Other recommended dependencies)<br>
+pip install scapy
+
+</p>
 
 <h4>
 Usage
