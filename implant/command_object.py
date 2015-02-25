@@ -30,7 +30,7 @@ class CommandObject(object):
         2 - {"cmd":"args"}
         3 - "cmd_name"
         4 - |cmd_name|arg1|arg2|arg3 (Where | is arbitrary non-alphanumerics, will split on whitespace as default)
-        5 - |cmd_name|^key1^value1|key2&value2 ( Where | and ^ are arbitrary non-alphanumerics, and ^ is NOT whitespace)
+        5 - |cmd_name|^key1^value1|key2^value2 ( Where | and ^ are arbitrary non-alphanumerics, and ^ is NOT whitespace)
         
         The constructor will attempt to do a few things:
         - extract Results and Success data. So do not send params with those keys.

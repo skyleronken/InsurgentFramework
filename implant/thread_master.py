@@ -32,7 +32,7 @@ class StoppableThread(threading.Thread):
         except Exception, e:
             return e
 
-def run_in_thread(func, args=None):
+def run_in_thread(func, args=dict()):
     if not hasattr(func, '__call__'):
         return None
     else:
@@ -58,6 +58,10 @@ def list_threads():
 def stop_thread(name):
     t = threads[name]
     t.stop()
+    
+def get_thread(name):
+    t = threads[name]
+    return t
 
 def set_thread_name(old_name, new_name):
     t = threads[old_name]
