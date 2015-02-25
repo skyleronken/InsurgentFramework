@@ -1,6 +1,6 @@
 
 from base64 import urlsafe_b64decode, urlsafe_b64encode
-from codec import Codec
+from implant.ifcodecs.codec import Codec
 
 class Base64C(Codec):
     

@@ -1,7 +1,6 @@
-
 import config
-import copy
-import ast
+from copy import deepcopy
+from ast import literal_eval
 
 FULL_DICT = 1
 SHORT_DICT = 2
@@ -47,7 +46,7 @@ class CommandObject(object):
                 if (type(data) is str or type(data) is unicode) and data[0] == '{':
                     # convert a textual version of a dictionary into a dict data type
                     # I don't really like this, but don't know any way around it...
-                    data = ast.literal_eval(data)
+                    data = literal_eval(data)
                 elif type(data) is str or type(data) is unicode:
                     #Check to see if this string has spaces, or other possibly delimiting characters.
                     if data.isalnum():
@@ -170,7 +169,7 @@ class CommandObject(object):
             
     def get_results(self):
         
-        sc = copy.deepcopy(self)
+        sc = deepcopy(self)
         res_string = ""
 
         if sc.format_type == SIMP_STRING or sc.format_type == DELIM_LIST:

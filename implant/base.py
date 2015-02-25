@@ -22,7 +22,7 @@ def get_host_id():
     Because this could possibly change in the future, I am implementing as
     a facade.
     """
-    return uuid.uuid1
+    return uuid1()
     
 
 def load_config():

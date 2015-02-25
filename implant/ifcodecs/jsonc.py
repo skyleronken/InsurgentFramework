@@ -1,5 +1,5 @@
 from json import loads, dumps
-from codec import Codec
+from implant.ifcodecs.codec import Codec
 
 class JSONC(Codec):
     

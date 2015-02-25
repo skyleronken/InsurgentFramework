@@ -28,7 +28,7 @@ def main(project_name, settings_file, framework_location, working_dir, debug):
     settings_file_name = settings_file.split(os.path.sep)[-1]
 
     hooks_dir = list()
-    hooks_dir.append(framework_location + "hooks")
+    hooks_dir.append(framework_location + os.path.sep + "hooks")
     
     working_dirs = list()
     working_dirs.append(working_dir)
@@ -63,9 +63,8 @@ def main(project_name, settings_file, framework_location, working_dir, debug):
     modules_to_import = list(set(modules_to_import)) # remove duplicates
     hidden_imports = str(modules_to_import)
 
-    working_dirs.append(framework_location)
-    for pkg in (config.BEACON_PKG, config.DECODER_PKG, config.ENCODER_PKG, config.COMMAND_PKG, config.RESPONDER_PKG):
-        working_dirs.append(framework_location + pkg.replace(".",os.path.sep))
+    for pkg in (config.BEACON_PKG, config.DECODER_PKG, config.ENCODER_PKG, config.COMMAND_PKG, config.RESPONDER_PKG, config.MODULE_PATH):
+        working_dirs.append(framework_location + os.path.sep +pkg.replace(".",os.path.sep))
     
     working_dirs = list(set(working_dirs)) #remove dupes
     working_dirs = str(working_dirs)
@@ -84,7 +83,7 @@ def main(project_name, settings_file, framework_location, working_dir, debug):
     spec_file.write("a = Analysis(['%s'],pathex=%s,hiddenimports=%s,hookspath=%s,runtime_hooks=None)%s" % (base_location,working_dirs,hidden_imports,hooks_dir,os.linesep))
     spec_file.write("a.datas += [('%s','%s','DATA')]%s" % (settings_file_name, settings_file, os.linesep))
     spec_file.write("pyz = PYZ(a.pure)%s" % os.linesep)
-    spec_file.write("exe = EXE(pyz,[%s],a.scripts,a.binaries,a.zipfiles,a.datas,name='%s',debug=%s,strip=%s,upx=%s,console=%s)" % (runtime_opt,project_name, debug, strip, upx, console))
+    spec_file.write("exe = EXE(pyz,a.scripts,[%s],a.binaries,a.zipfiles,a.datas,name='%s',debug=%s,strip=%s,upx=%s,console=%s)" % (runtime_opt, project_name, debug, strip, upx, console))
     
     spec_file.flush()
     spec_file.seek(0)
@@ -99,6 +98,7 @@ def main(project_name, settings_file, framework_location, working_dir, debug):
 
     make_cmd_line = []
     make_cmd_line.append("pyinstaller")
+    make_cmd_line.append("--ascii")
     if debug:
         make_cmd_line.append("--log-level=DEBUG")
     else:
