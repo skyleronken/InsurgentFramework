@@ -98,7 +98,7 @@ def print_main_menu():
     [3] Delete argument
     [4] Show current arguments
     [5] Set Format Type
-    [6] Set Delimeter
+    [6] Set Delimiter
     [7] Set Args Delimeter
     [8] Show CommandObject Representation
     [9] Print Constructed Command String

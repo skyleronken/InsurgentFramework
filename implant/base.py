@@ -80,17 +80,23 @@ def start_beacon_loop(controller):
     this is the iterative loop that calls the controller to start beaconing.
     This should implement behaviors related to the overall success and failure of a beaconing iteration.
     """
-    
+    beacon_count = 0
     while config.CONTINUE_BEACON:
         
+        if beacon_count == 0:
+            # dont sleep on startup
+            sleep_int = 0
+        else:
+             # based upon the results of the beaconing iteration, implement behaviors here to do if fail/success
+            sleep_int = calculate_sleep()
+            print  config.PROMPT + " Sleeping for %d seconds" % (sleep_int)
+            time.sleep(sleep_int)
+            
         # Call the controller's beaconing facade, which in turns starts the beaconing iteration.
         controller.beacon(config.NODES)
-        # based upon the results of the beaconing iteration, implement behaviors here to do if fail/success
-        sleep_int = calculate_sleep()
-        print  config.PROMPT + " Sleeping for %d seconds" % (sleep_int)
-        time.sleep(sleep_int)
+        beacon_count += 1
         
-    return True
+    return beacon_count
                 
 
 def main():
@@ -102,7 +108,9 @@ def main():
     controller = Controller(config.BEACONS, config.COMMANDS, config.DECODERS, config.ENCODERS, config.RESPONDERS)
     
     print config.PROMPT + " Starting beaconer loop..."
-    start_beacon_loop(controller)
+    beacon_count = start_beacon_loop(controller)
+    
+    print config.PROMPT + " Beaconed %d times" % (beacon_count)
     
 
 if __name__ == "__main__":

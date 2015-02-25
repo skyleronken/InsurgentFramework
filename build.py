@@ -25,7 +25,8 @@ def main(project_name, settings_file, framework_location, working_dir, debug):
     
     base_location = framework_location + os.path.sep + config.MODULE_PATH + os.path.sep + "base.py"
     
-    settings_file_name = settings_file.split(os.path.sep)[-1]
+    #settings_file_name = settings_file.split(os.path.sep)[-1]
+    settings_file_name = config.DEFAULT_CONFIG_FILE
 
     hooks_dir = list()
     hooks_dir.append(framework_location + os.path.sep + "hooks")
