@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from argparse import ArgumentParser
+from ast import literal_eval
 from implant.controller import Controller
 from implant.command_object import CommandObject
 import config_parser
@@ -57,6 +58,8 @@ class Translator:
         """
         loops through data and convert its to CommandObjects
         """
+        if data[0] == '[':
+            data = literal_eval(data)
         return Controller.recursive_convert_to_cmd_objects(data)
 
 def print_header():
