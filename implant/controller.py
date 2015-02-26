@@ -86,6 +86,7 @@ class Controller:
         This function will fail gracefully. Would rather not execute a badly decoded command than crash the process.
         """
         com_objs = []
+        
         try: 
             if type(data) is list or type(data) is tuple:
                 

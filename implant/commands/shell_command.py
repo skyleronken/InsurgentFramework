@@ -16,7 +16,6 @@ class ShellCommand(Command):
     def execute(self, args):
         
         cmd_line = args[COMMAND_LINE]
-        print cmd_line
         success = True
         cmd_line = cmd_line.split()
 

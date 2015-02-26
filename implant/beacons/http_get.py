@@ -2,9 +2,15 @@ import httplib
 from socket import error as socket_error
 from beacon import Beacon
 
+NODE_KEY = 'node'
+PATH_KEY = 'path'
+PORT_KEY = 'port'
+
 class HttpGet(Beacon):
 
     display_name = "HTTP Download"
+    index = {NODE_KEY:"IP/Host of server",PATH_KEY:"Path of file/script to request",PORT_KEY:"Port server is listening on"}
+    
     
     def agnosticize(self, response):
         
@@ -15,9 +21,9 @@ class HttpGet(Beacon):
     def beacon(self,arguments):
         success = True
         
-        node = arguments.get('node')
-        path = arguments.get('path')
-        port = arguments.get('port')
+        node = arguments.get(NODE_KEY)
+        path = arguments.get(PATH_KEY)
+        port = arguments.get(PORT_KEY)
         timeout = arguments.get('timeout', 8) # Should this be passed? Probably not...
         
         conn = httplib.HTTPConnection(node, port, timeout=timeout)
