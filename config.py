@@ -39,6 +39,7 @@ NODE_IP_KEY = 'node'
 NODE_PORT_KEY = 'port'
 BEACON_TYPE_IND = 0
 PARAMS_IND = 1
+
 CMD_SUCCESS_IND = -2 # These are used when the CommandObject is parsed and transformed into non-KVP delimeted lists.
 CMD_RESULTS_IND = -1
 

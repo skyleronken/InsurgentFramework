@@ -416,8 +416,9 @@ class Controller:
             # Attempt to beacon. Returns an Order object or None.
             success, order = self.handle_beacon(nodes)
             
-            # Send response to decoders
+            # Send response to decoders if successful beacon 
             if success:
+                
                 success, decoded_data = self.handle_decode(order.raw_response)
             else:
                 return False 

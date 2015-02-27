@@ -13,7 +13,7 @@ class Order:
     results = None
     response = None
     uuid = None
-    
+
     
     def __init__(self):
         self.uuid = uuid4()

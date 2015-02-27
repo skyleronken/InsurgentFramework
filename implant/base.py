@@ -7,7 +7,7 @@ from random import randint
 import sys
 from config_parser import *
 import os
-from uuid import uuid1
+from uuid import getnode
 
 def get_host_id():
     """
@@ -22,7 +22,7 @@ def get_host_id():
     Because this could possibly change in the future, I am implementing as
     a facade.
     """
-    return uuid1()
+    return getnode()
     
 
 def load_config():

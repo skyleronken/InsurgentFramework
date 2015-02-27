@@ -1,6 +1,7 @@
 import config
 from copy import deepcopy
 from ast import literal_eval
+from uuid import uuid4
 
 FULL_DICT = 1
 SHORT_DICT = 2
@@ -12,6 +13,7 @@ ft_dict = {FULL_DICT:"Full Dictionary",SHORT_DICT:"Short Dictionary", SIMP_STRIN
 
 class CommandObject(object):
     
+    uuid = None
     name = None
     args = None
     success = None
@@ -38,6 +40,8 @@ class CommandObject(object):
         but it will also take strings and single datatypes and add them into a dictionary with the key of '0'. So for all intents and purposes
         the args will make it transparent to the command modules whehter or not its a list or a dictionary.
         """
+        # generate UUID for command
+        self.uuid = uuid4()
         self.args = {}
         if (data is not None):
             try:
