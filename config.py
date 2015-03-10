@@ -61,7 +61,7 @@ BEACON_ABC = 'beacon'
 COMMAND_ABC = 'command'
 DECODER_ABC = 'codec'
 ENCODER_ABC = 'codec'
-RESPONDR_ABC = 'beacon'
+RESPONDER_ABC = 'beacon'
 
 
 # Default Behaviors

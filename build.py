@@ -61,6 +61,11 @@ def main(project_name, settings_file, framework_location, working_dir, debug):
     print "%s Compiling hidden imports" % (config.PROMPT)
     
     modules_to_import = beacon_types + decoder_types + command_types + encoder_types + responder_types
+    modules_to_import = modules_to_import + [config.COMMAND_PKG + "." + config.COMMAND_ABC
+                                            , config.BEACON_PKG + "." + config.BEACON_ABC
+                                            , config.DECODER_PKG + "." + config.DECODER_ABC
+                                            , config.ENCODER_PKG + "." + config.ENCODER_ABC
+                                            , config.RESPONDER_PKG + "." + config.RESPONDER_ABC]
     modules_to_import = list(set(modules_to_import)) # remove duplicates
     hidden_imports = str(modules_to_import)
 
