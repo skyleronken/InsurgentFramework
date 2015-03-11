@@ -23,7 +23,7 @@ def parse_module_types(xml, pkg):
 
 def main(project_name, settings_file, framework_location, working_dir, debug):
     
-    base_location = framework_location + os.path.sep + config.MODULE_PATH + os.path.sep + "base.py"
+    base_location = os.path.normpath(framework_location + os.path.sep + config.MODULE_PATH + os.path.sep + "base.py")
     
     #settings_file_name = settings_file.split(os.path.sep)[-1]
     settings_file_name = config.DEFAULT_CONFIG_FILE
@@ -86,7 +86,7 @@ def main(project_name, settings_file, framework_location, working_dir, debug):
     spec_file = NamedTemporaryFile(suffix=".spec",delete=False)
     
     spec_file.write("# -*- mode: python -*-%s" % os.linesep)
-    spec_file.write("a = Analysis(['%s'],pathex=%s,hiddenimports=%s,hookspath=%s,runtime_hooks=None)%s" % (base_location,working_dirs,hidden_imports,hooks_dir,os.linesep))
+    spec_file.write("a = Analysis([%s],pathex=%s,hiddenimports=%s,hookspath=%s,runtime_hooks=None)%s" % (repr(base_location),working_dirs,hidden_imports,hooks_dir,os.linesep))
     spec_file.write("a.datas += [('%s','%s','DATA')]%s" % (settings_file_name, settings_file, os.linesep))
     spec_file.write("pyz = PYZ(a.pure)%s" % os.linesep)
     spec_file.write("exe = EXE(pyz,a.scripts,[%s],a.binaries,a.zipfiles,a.datas,name='%s',debug=%s,strip=%s,upx=%s,console=%s)" % (runtime_opt, project_name, debug, strip, upx, console))
