@@ -8,8 +8,8 @@ PORT_KEY = 'port'
 
 class HttpGet(Beacon):
 
-    display_name = "HTTP Download"
-    index = {NODE_KEY:"IP/Host of server",PATH_KEY:"Path of file/script to request",PORT_KEY:"Port server is listening on"}
+    display_name = "HTTP GET"
+    index = {NODE_KEY:"IP/Host",PATH_KEY:"Request Path",PORT_KEY:"Port"}
     
     
     def agnosticize(self, response):

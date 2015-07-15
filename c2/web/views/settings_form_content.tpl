@@ -20,7 +20,9 @@
                 <label for="inputNodeType" class="col-sm-2 control-label">Type</label>
                 <div class="col-sm-3" id="inputNodeType">
                     <select class="form-control">
-                        <option>1</option>
+                        % for node in node_modules:
+                          <option>{{node.display_name}}</option>
+                        % end
                     </select>
                 </div>
               </div>
@@ -58,4 +60,39 @@
     </div>
 </div>
 %end
-%rebase('settings_form.tpl', nodesform=nodesform)
+
+%def commandsform():
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Select Commands</h2>
+        </div>
+        <div class="col-md-6">
+            <nav>
+              <ul class="pager">
+                <li><a href="/#info">Previous</a></li>
+                <li><a href="/#behaviors">Next</a></li>
+              </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <ul class="list-group">
+              % for cmd in command_modules:
+                <li class="list-group-item">
+                  <button type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                  {{cmd.display_name}}
+                </li>
+              %end
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <table class="table table-condensed table-bordered" id="nodesTable">
+            </table>
+        </div>
+    </div>
+</div>
+%end
+
+%rebase('settings_form.tpl', nodesform=nodesform, commandsform=commandsform)
