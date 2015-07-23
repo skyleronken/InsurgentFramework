@@ -1,6 +1,6 @@
 from bottle import route, run, template, Bottle, view, TEMPLATE_PATH
 import pkgutil
-from implant import beacons, commands
+from implant import beacons, commands, ifcodecs
 from types import ModuleType
 from implant.controller import Controller
 
@@ -46,9 +46,15 @@ builder = Bottle()
 TEMPLATE_PATH.insert(0,'./c2/web/views')
 
 @builder.route('/')
+def index():
+    return template('home')
+
 @builder.route('/builder')
 def builder_index():
-    return template('builder',node_modules=get_module_list(beacons,'Beacon'),command_modules=get_module_list(commands,'Command'))
+    return template('builder',node_modules=get_module_list(beacons,'Beacon')
+                            ,command_modules=get_module_list(commands,'Command')
+                            ,encoding_modules=get_module_list(ifcodecs,'Codec')
+                            )
     
 @builder.route('/builder/create')
 def create_settings():
