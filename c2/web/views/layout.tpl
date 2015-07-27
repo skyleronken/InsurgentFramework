@@ -5,7 +5,7 @@
   <link href="/src/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
   <script src="/src/scripts/jquery-1.11.2.min.js"></script>
   <script src="/src/bootstrap/js/bootstrap.min.js"></script>
-  <script src="/src/scripts/settings_form.js"></script>  
+  <script src="/src/scripts/settings_form.js"></script>
 </head>
 <body>
   <div class="container-fluid">

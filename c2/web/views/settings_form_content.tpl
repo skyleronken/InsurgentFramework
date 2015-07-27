@@ -149,7 +149,7 @@
 %def buildform():
 <div class="jumbotron">
   <div class="center-block">
-    <button type="button" class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Build</button>
+    <button type="button" class="btn btn-danger btn-lg" id="buildButton"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Build</button>
   </div>
 </div>
 %end
